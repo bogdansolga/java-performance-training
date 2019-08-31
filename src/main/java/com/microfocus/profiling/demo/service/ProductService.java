@@ -58,19 +58,23 @@ public class ProductService {
         return totalSales;
     }
 
-    public List<Product> getALotOfProducts(final String productType) {
+    public List<Product> getALotOfProducts(final String productType, final String retrievingType) {
+        final long now = System.currentTimeMillis();
+
         final int howMany = random.nextInt(30);
         final List<Product> products = new ArrayList<>(howMany);
         for (int i = 0; i < howMany; i++) {
-            products.add(new Product(i, "The " + productType + " with the ID " + i, random.nextDouble()));
+            products.add(new Product(i, "The " + productType + " with the ID " + i, 1000 * random.nextDouble()));
             sleepALittle();
         }
 
+        System.out.println("[" + retrievingType + "] Returning " + products.size() + " " + productType + "s took "
+                + (System.currentTimeMillis() - now) + " ms");
         return products;
     }
 
     public synchronized List<Product> getSynchronizedProducts(final String productType) {
-        return getALotOfProducts(productType);
+        return getALotOfProducts(productType, "synchronized");
     }
 
     private void sleepALittle() {
