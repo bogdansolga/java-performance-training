@@ -47,7 +47,7 @@ public class ProductService {
                  .forEach(index -> products.add(new Product(index, "The product " + index, 20 * random.nextDouble())));
 
         final double totalPrice = products.stream()
-                                          .peek(it -> takeAShortNap())
+                                          .peek(it -> sleepALittle(100))
                                           .mapToDouble(Product::getPrice)
                                           .sum();
         System.out.println("The total price of the " + products.size() + " products is " + decimalFormat.format(totalPrice));
@@ -66,7 +66,7 @@ public class ProductService {
         final List<Product> products = new ArrayList<>(howMany);
         for (int i = 0; i < howMany; i++) {
             products.add(new Product(i, "The " + productType + " with the ID " + i, 1000 * random.nextDouble()));
-            sleepALittle();
+            sleepALittle(1500);
         }
 
         System.out.println("[" + retrievingType + "] Returning " + products.size() + " " + productType + "s took "
@@ -78,17 +78,9 @@ public class ProductService {
         return getALotOfProducts(productType, "synchronized");
     }
 
-    private void sleepALittle() {
+    private void sleepALittle(final int bound) {
         try {
-            Thread.sleep(random.nextInt(1500));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void takeAShortNap() {
-        try {
-            Thread.sleep(random.nextInt(100));
+            Thread.sleep(random.nextInt(bound));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
