@@ -5,7 +5,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.IntStream;
@@ -54,5 +56,28 @@ public class ProductService {
 
     public double getTotalSales() {
         return totalSales;
+    }
+
+    public List<Product> getALotOfProducts(final String productType) {
+        final int howMany = random.nextInt(30);
+        final List<Product> products = new ArrayList<>(howMany);
+        for (int i = 0; i < howMany; i++) {
+            products.add(new Product(i, "The " + productType + " with the ID " + i, random.nextDouble()));
+            sleepALittle();
+        }
+
+        return products;
+    }
+
+    public synchronized List<Product> getSynchronizedProducts(final String productType) {
+        return getALotOfProducts(productType);
+    }
+
+    private void sleepALittle() {
+        try {
+            Thread.sleep(random.nextInt(1500));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
