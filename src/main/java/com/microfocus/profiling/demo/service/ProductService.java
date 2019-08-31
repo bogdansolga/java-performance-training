@@ -47,6 +47,7 @@ public class ProductService {
                  .forEach(index -> products.add(new Product(index, "The product " + index, 20 * random.nextDouble())));
 
         final double totalPrice = products.stream()
+                                          .peek(it -> takeAShortNap())
                                           .mapToDouble(Product::getPrice)
                                           .sum();
         System.out.println("The total price of the " + products.size() + " products is " + decimalFormat.format(totalPrice));
@@ -80,6 +81,14 @@ public class ProductService {
     private void sleepALittle() {
         try {
             Thread.sleep(random.nextInt(1500));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void takeAShortNap() {
+        try {
+            Thread.sleep(random.nextInt(100));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
