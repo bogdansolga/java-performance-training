@@ -44,7 +44,7 @@ public class ProductService {
         final int size = random.nextInt(50);
         final Set<Product> products = new HashSet<>(size);
         IntStream.range(0, size)
-                 .forEach(index -> products.add(new Product(index, "The product " + index, 20 * random.nextDouble())));
+                 .forEach(index -> products.add(buildProduct(index)));
 
         final double totalPrice = products.stream()
                                           .peek(it -> sleepALittle(100))
@@ -64,10 +64,9 @@ public class ProductService {
 
         final int howMany = random.nextInt(30);
         final List<Product> products = new ArrayList<>(howMany);
-        for (int i = 0; i < howMany; i++) {
-            products.add(new Product(i, "The " + productType + " with the ID " + i, 1000 * random.nextDouble()));
-            sleepALittle(1500);
-        }
+        IntStream.range(0, howMany)
+                 .peek(this::sleepALittle)
+                 .forEach(index -> products.add(buildProduct(index)));
 
         System.out.println("[" + retrievingType + "] Returning " + products.size() + " " + productType + "s took "
                 + (System.currentTimeMillis() - now) + " ms");
@@ -76,6 +75,10 @@ public class ProductService {
 
     public synchronized List<Product> getSynchronizedProducts(final String productType) {
         return getALotOfProducts(productType, "synchronized");
+    }
+
+    private Product buildProduct(final int index) {
+        return new Product(index, "The product " + index, 1000 * random.nextDouble());
     }
 
     private void sleepALittle(final int bound) {
