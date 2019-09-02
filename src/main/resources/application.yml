@@ -15,5 +15,9 @@ server:
     max-threads: 5
 
 spring:
+  jackson:
+    serialization:
+      INDENT_OUTPUT : true
+
   jmx:
     default-domain: 'com.microfocus.profiling.demo'
