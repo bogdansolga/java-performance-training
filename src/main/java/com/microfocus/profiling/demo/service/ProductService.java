@@ -83,7 +83,7 @@ public class ProductService {
 
     private void sleepALittle(final int bound) {
         try {
-            Thread.sleep(random.nextInt(bound));
+            Thread.sleep(random.nextInt(Math.abs(bound) + 10));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
