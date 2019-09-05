@@ -29,14 +29,14 @@ public class ProductService {
     public void simulateProductsProcessing() {
         System.out.println();
 
-        final long memoryBefore = (runtime.totalMemory() - runtime.freeMemory()) / BYTES_IN_MB;
+        final long memoryBefore = getFreeMemory() / BYTES_IN_MB;
         System.out.println("JVM memory in use before: " + memoryBefore + " MB");
 
         final long now = System.currentTimeMillis();
         processALotOfProducts();
         System.out.println("The entire processing took " + (System.currentTimeMillis() - now) + " ms");
 
-        final long memoryAfter = (runtime.totalMemory() - runtime.freeMemory()) / BYTES_IN_MB;
+        final long memoryAfter = getFreeMemory() / BYTES_IN_MB;
         System.out.println("JVM memory in use after: " + memoryAfter + " MB");
     }
 
@@ -53,6 +53,29 @@ public class ProductService {
         System.out.println("The total price of the " + products.size() + " products is " + decimalFormat.format(totalPrice));
 
         totalSales += totalPrice;
+    }
+
+    @Scheduled(fixedRate = 5000)
+    public void generateALotOfData() {
+        final int howMany = 1_000_000;
+
+        final long memoryBefore = getFreeMemory() / BYTES_IN_MB;
+        System.out.println("JVM memory in use before generating a lot of data: " + memoryBefore + " MB");
+
+        final Set<Product> products = new HashSet<>(howMany);
+        IntStream.range(0, howMany)
+                 .forEach(index -> products.add(buildProduct(index)));
+        System.out.println(products.stream()
+                                   .peek(it -> sleepALittle(200))
+                                   .mapToDouble(Product::getPrice)
+                                   .sum());
+
+        final long memoryAfter = getFreeMemory() / BYTES_IN_MB;
+        System.out.println("JVM memory in use after generating a lot of data: " + memoryAfter + " MB");
+    }
+
+    private long getFreeMemory() {
+        return runtime.totalMemory() - runtime.freeMemory();
     }
 
     public double getTotalSales() {
