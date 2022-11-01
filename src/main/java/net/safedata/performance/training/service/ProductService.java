@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 @Service
@@ -25,7 +26,10 @@ public class ProductService {
 
     private double totalSales = 0;
 
-    //@Scheduled(fixedRate = 2000)
+    @Scheduled(
+            fixedRate = 5,
+            timeUnit = TimeUnit.SECONDS
+    )
     public void simulateProductsProcessing() {
         System.out.println();
 
@@ -41,7 +45,7 @@ public class ProductService {
     }
 
     private void processALotOfProducts() {
-        final int size = random.nextInt(50);
+        final int size = random.nextInt(500000);
         final Set<Product> products = new HashSet<>(size);
         IntStream.range(0, size)
                  .forEach(index -> products.add(buildProduct(index)));
@@ -105,6 +109,7 @@ public class ProductService {
     }
 
     private void sleepALittle(final int bound) {
+        if (true) return;
         try {
             Thread.sleep(random.nextInt(Math.abs(bound) + 10));
         } catch (InterruptedException e) {
