@@ -36,7 +36,7 @@ public class ProductController {
         return productService.getSynchronizedProducts(productType);
     }
 
-    @GetMapping("/deferred-resul/{productType}")
+    @GetMapping("/deferred-result")
     public DeferredResult<ResponseEntity<?>> deferredResultProcessing() {
         DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
         deferredResult.onTimeout(() -> ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT)
@@ -52,7 +52,7 @@ public class ProductController {
         return deferredResult;
     }
 
-    @GetMapping("/cf/{productType}")
+    @GetMapping("/cf")
     public CompletableFuture<ResponseEntity<?>> completableFeature() {
         return CompletableFuture.completedFuture(ResponseEntity.ok()
                                                                .body(productService.getTotalSales()));
