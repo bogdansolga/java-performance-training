@@ -17,15 +17,15 @@ public class ProductService {
 
     private static final long BYTES_IN_MB = 1048576;
 
+    private static final Runtime RUNTIME = Runtime.getRuntime();
+
     private final DecimalFormat decimalFormat = new DecimalFormat("##.##");
 
     private final Random random = new Random(20000);
 
-    private final Runtime runtime = Runtime.getRuntime();
-
     private double totalSales = 0;
 
-    @Scheduled(fixedRate = 2000)
+    //@Scheduled(fixedRate = 2000)
     public void simulateProductsProcessing() {
         System.out.println();
 
@@ -55,7 +55,7 @@ public class ProductService {
         totalSales += totalPrice;
     }
 
-    @Scheduled(fixedRate = 5000)
+    //@Scheduled(fixedRate = 5000)
     public void generateALotOfData() {
         final int howMany = 1_000_000;
 
@@ -75,7 +75,7 @@ public class ProductService {
     }
 
     private long getFreeMemory() {
-        return runtime.totalMemory() - runtime.freeMemory();
+        return RUNTIME.totalMemory() - RUNTIME.freeMemory();
     }
 
     public double getTotalSales() {
