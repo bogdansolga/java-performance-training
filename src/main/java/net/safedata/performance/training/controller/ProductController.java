@@ -1,7 +1,7 @@
-package com.microfocus.profiling.demo.controller;
+package net.safedata.performance.training.controller;
 
-import com.microfocus.profiling.demo.model.Product;
-import com.microfocus.profiling.demo.service.ProductService;
+import net.safedata.performance.training.model.Product;
+import net.safedata.performance.training.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

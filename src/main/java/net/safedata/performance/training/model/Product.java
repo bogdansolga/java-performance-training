@@ -1,4 +1,4 @@
-package com.microfocus.profiling.demo.model;
+package net.safedata.performance.training.model;
 
 import java.text.DecimalFormat;
 import java.util.Objects;

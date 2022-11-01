@@ -1,4 +1,4 @@
-package com.microfocus.profiling.demo;
+package net.safedata.performance.training;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

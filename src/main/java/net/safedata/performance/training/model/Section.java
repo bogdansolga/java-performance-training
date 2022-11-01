@@ -1,4 +1,4 @@
-package com.microfocus.profiling.demo.model;
+package net.safedata.performance.training.model;
 
 import java.util.List;
 import java.util.Objects;

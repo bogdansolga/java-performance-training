@@ -1,6 +1,6 @@
-package com.microfocus.profiling.demo.mbean;
+package net.safedata.performance.training.mbean;
 
-import com.microfocus.profiling.demo.service.ProductService;
+import net.safedata.performance.training.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;

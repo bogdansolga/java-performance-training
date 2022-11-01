@@ -1,4 +1,4 @@
-package com.microfocus.profiling.demo.config;
+package net.safedata.performance.training.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

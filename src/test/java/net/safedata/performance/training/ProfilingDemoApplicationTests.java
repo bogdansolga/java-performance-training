@@ -1,4 +1,4 @@
-package com.microfocus.profiling.demo;
+package net.safedata.performance.training;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,6 +1,6 @@
-package com.microfocus.profiling.demo.service;
+package net.safedata.performance.training.service;
 
-import com.microfocus.profiling.demo.model.Product;
+import net.safedata.performance.training.model.Product;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
