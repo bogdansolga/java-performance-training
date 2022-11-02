@@ -1,11 +1,13 @@
 package net.safedata.performance.training.service;
 
 import net.safedata.performance.training.model.Product;
+import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -25,6 +27,7 @@ public class ProductService {
     private final Random random = new Random(20000);
 
     private double totalSales = 0;
+    private final Set<Product> products = new HashSet<>();
 
     @Scheduled(
             fixedRate = 5,
@@ -42,11 +45,20 @@ public class ProductService {
 
         final long memoryAfter = getFreeMemory() / BYTES_IN_MB;
         System.out.println("JVM memory in use after: " + memoryAfter + " MB");
+
+        // double brace init - potential cause for a memory leak
+        new HashMap<Integer, Product>() {{
+            IntStream.range(0, 200)
+                     .forEach(index -> put(index, buildProduct(random.nextInt())));
+        }};
+
+        { // inner / private / anonymous block
+            final Product product = buildProduct(20);
+        }
     }
 
     private void processALotOfProducts() {
         final int size = random.nextInt(500000);
-        final Set<Product> products = new HashSet<>(size);
         IntStream.range(0, size)
                  .forEach(index -> products.add(buildProduct(index)));
 
