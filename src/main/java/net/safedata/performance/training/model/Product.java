@@ -49,13 +49,12 @@ public class Product extends AbstractEntity {
         if (!(o instanceof Product)) return false;
         Product product = (Product) o;
         return id == product.id &&
-                Objects.equals(name, product.name) &&
-                Objects.equals(price, product.price);
+                Objects.equals(name, product.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, price);
+        return Objects.hash(id, name);
     }
 
     @Override
