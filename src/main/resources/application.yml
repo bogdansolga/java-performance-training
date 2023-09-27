@@ -20,4 +20,4 @@ spring:
       INDENT_OUTPUT : true
 
   jmx:
-    default-domain: 'com.microfocus.profiling.demo'
+    default-domain: ' net.safedata.performance.training'
