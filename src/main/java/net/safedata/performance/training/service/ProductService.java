@@ -1,7 +1,6 @@
 package net.safedata.performance.training.service;
 
 import net.safedata.performance.training.model.Product;
-import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +26,7 @@ public class ProductService {
     private final Random random = new Random(20000);
 
     private double totalSales = 0;
-    private final Set<Product> products = new HashSet<>();
+    private final List<Product> products = new ArrayList<>();
 
     @Scheduled(
             fixedRate = 5,
@@ -117,7 +116,7 @@ public class ProductService {
     }
 
     private Product buildProduct(final int index) {
-        return new Product(index, "The product " + index, 1000 * random.nextDouble());
+        return new Product(index, "The product " + index, 1000 * random.nextInt(50000));
     }
 
     private void sleepALittle(final int bound) {
