@@ -1,6 +1,8 @@
 package net.safedata.performance.training.service;
 
 import net.safedata.performance.training.model.Product;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -17,13 +19,15 @@ import java.util.stream.IntStream;
 @Service
 public class ProductService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProductService.class);
+
     private static final long BYTES_IN_MB = 1048576;
+
+    private static final Random RANDOM = new Random(20000);
 
     private static final Runtime RUNTIME = Runtime.getRuntime();
 
-    private final DecimalFormat decimalFormat = new DecimalFormat("##.##");
-
-    private final Random random = new Random(20000);
+    private final DecimalFormat decimalFormat = new DecimalFormat("#,###.#");
 
     private double totalSales = 0;
     private final List<Product> products = new ArrayList<>();
@@ -36,36 +40,36 @@ public class ProductService {
         System.out.println();
 
         final long memoryBefore = getFreeMemory() / BYTES_IN_MB;
-        System.out.println("JVM memory in use before: " + memoryBefore + " MB");
+        LOGGER.info("JVM memory in use before: {} MB", memoryBefore);
 
         final long now = System.currentTimeMillis();
         processALotOfProducts();
-        System.out.println("The entire processing took " + (System.currentTimeMillis() - now) + " ms");
+        LOGGER.info("The entire processing took {} ms", System.currentTimeMillis() - now);
 
         final long memoryAfter = getFreeMemory() / BYTES_IN_MB;
-        System.out.println("JVM memory in use after: " + memoryAfter + " MB");
+        LOGGER.info("JVM memory in use after: {} MB", memoryAfter);
 
         // double brace init - potential cause for a memory leak
         new HashMap<Integer, Product>() {{
             IntStream.range(0, 200)
-                     .forEach(index -> put(index, buildProduct(random.nextInt())));
+                     .forEach(index -> put(index, buildProduct(RANDOM.nextInt())));
         }};
 
         { // inner / private / anonymous block
+            @SuppressWarnings("unused")
             final Product product = buildProduct(20);
         }
     }
 
     private void processALotOfProducts() {
-        final int size = random.nextInt(500000);
+        final int size = RANDOM.nextInt(500000);
         IntStream.range(0, size)
                  .forEach(index -> products.add(buildProduct(index)));
 
         final double totalPrice = products.stream()
-                                          .peek(it -> sleepALittle(100))
                                           .mapToDouble(Product::getPrice)
                                           .sum();
-        System.out.println("The total price of the " + products.size() + " products is " + decimalFormat.format(totalPrice));
+        LOGGER.info("The total price of {} products is {}", products.size(), decimalFormat.format(totalPrice));
 
         totalSales += totalPrice;
     }
@@ -75,18 +79,17 @@ public class ProductService {
         final int howMany = 1_000_000;
 
         final long memoryBefore = getFreeMemory() / BYTES_IN_MB;
-        System.out.println("JVM memory in use before generating a lot of data: " + memoryBefore + " MB");
+        LOGGER.info("JVM memory in use before generating a lot of data: {} MB", memoryBefore);
 
         final Set<Product> products = new HashSet<>(howMany);
         IntStream.range(0, howMany)
                  .forEach(index -> products.add(buildProduct(index)));
-        System.out.println(products.stream()
-                                   .peek(it -> sleepALittle(200))
-                                   .mapToDouble(Product::getPrice)
-                                   .sum());
+        LOGGER.info("The products cost: {}", products.stream()
+                                                     .mapToDouble(Product::getPrice)
+                                                     .sum());
 
         final long memoryAfter = getFreeMemory() / BYTES_IN_MB;
-        System.out.println("JVM memory in use after generating a lot of data: " + memoryAfter + " MB");
+        LOGGER.info("JVM memory in use after generating a lot of data: {} MB", memoryAfter);
     }
 
     private long getFreeMemory() {
@@ -100,14 +103,13 @@ public class ProductService {
     public List<Product> getALotOfProducts(final String productType, final String retrievingType) {
         final long now = System.currentTimeMillis();
 
-        final int howMany = random.nextInt(30);
+        final int howMany = RANDOM.nextInt(30);
         final List<Product> products = new ArrayList<>(howMany);
         IntStream.range(0, howMany)
                  .peek(this::sleepALittle)
                  .forEach(index -> products.add(buildProduct(index)));
 
-        System.out.println("[" + retrievingType + "] Returning " + products.size() + " " + productType + "s took "
-                + (System.currentTimeMillis() - now) + " ms");
+        LOGGER.info("[{}] Returning {} {}s took {} ms", retrievingType, products.size(), productType, (System.currentTimeMillis() - now));
         return products;
     }
 
@@ -116,15 +118,16 @@ public class ProductService {
     }
 
     private Product buildProduct(final int index) {
-        return new Product(index, "The product " + index, 1000 * random.nextInt(50000));
+        sleepALittle(50);
+        return new Product(index, "The product " + index, 1000 * RANDOM.nextInt(50000));
     }
 
     private void sleepALittle(final int bound) {
-        if (true) return;
+        if (true) return; //TODO uncomment to add some processing time
         try {
-            Thread.sleep(random.nextInt(Math.abs(bound) + 10));
+            Thread.sleep(RANDOM.nextInt(Math.abs(bound) + 10));
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
         }
     }
 }
