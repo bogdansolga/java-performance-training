@@ -25,8 +25,9 @@ public class ProductService {
 
     private final DecimalFormat decimalFormat = new DecimalFormat("#,###.#");
 
-    private double totalSales = 0;
+    // kept in memory to show the case of a continuously growing memory
     private final List<Product> products = new ArrayList<>();
+    private double totalSales = 0;
 
     /*
     @Scheduled(
