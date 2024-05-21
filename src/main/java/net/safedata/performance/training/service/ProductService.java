@@ -148,7 +148,7 @@ public class ProductService {
     private void sleepALittle(final int bound) {
         //if (true) return; //TODO uncomment to add some processing time
         try {
-            Thread.sleep(RANDOM.nextInt(Math.abs(bound)));
+            Thread.sleep(RANDOM.nextInt(Math.abs(bound) + 10));
         } catch (InterruptedException e) {
             LOGGER.error(e.getMessage(), e);
         }
