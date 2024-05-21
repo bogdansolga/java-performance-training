@@ -11,8 +11,9 @@ logging:
 
 server:
   tomcat:
-    min-spare-threads: 2
-    max-threads: 5
+    threads:
+      max: 10
+      min-spare: 2
 
 spring:
   jackson:
@@ -21,3 +22,7 @@ spring:
 
   jmx:
     default-domain: ' net.safedata.performance.training'
+
+execution:
+  time:
+    tracing: true
