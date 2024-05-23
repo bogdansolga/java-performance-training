@@ -200,4 +200,8 @@ public class ProductService {
             final Product product = buildProduct(20);
         }
     }
+
+    public List<net.safedata.performance.training.domain.model.Product> getDatabaseProducts() {
+        return productRepository.findAll();
+    }
 }

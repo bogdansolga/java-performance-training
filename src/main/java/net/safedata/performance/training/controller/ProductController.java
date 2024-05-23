@@ -31,6 +31,11 @@ public class ProductController {
         return productService.getALotOfProducts(productType, "non-synchronized");
     }
 
+    @GetMapping
+    public List<net.safedata.performance.training.domain.model.Product> allProducts() {
+        return productService.getDatabaseProducts();
+    }
+
     @GetMapping("/long/sync/{productType}")
     public List<Product> getSynchronizedProducts(@PathVariable final String productType) {
         return productService.getSynchronizedProducts(productType);
