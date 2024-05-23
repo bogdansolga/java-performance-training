@@ -7,11 +7,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
 
+import javax.sql.DataSource;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -39,10 +41,12 @@ public class ProductService {
     private final List<Product> products = new ArrayList<>();
     private double totalSales = 0;
 
+    private final JdbcTemplate jdbcTemplate;
     private final ProductRepository productRepository;
 
     @Autowired
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(DataSource dataSource, ProductRepository productRepository) {
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.productRepository = productRepository;
     }
 
@@ -202,6 +206,9 @@ public class ProductService {
     }
 
     public List<net.safedata.performance.training.domain.model.Product> getDatabaseProducts() {
-        return productRepository.findAll();
+        return jdbcTemplate.query("SELECT * FROM product", (rs, row) ->
+                new net.safedata.performance.training.domain.model.Product(rs.getInt("id"),
+                        rs.getString("name"), rs.getDouble("price")));
+        //return productRepository.findAll();
     }
 }
