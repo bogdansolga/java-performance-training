@@ -1,10 +1,15 @@
 package net.safedata.performance.training.service;
 
+import net.safedata.performance.training.domain.repository.ProductRepository;
 import net.safedata.performance.training.model.Product;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
 
 import java.text.DecimalFormat;
@@ -33,6 +38,26 @@ public class ProductService {
     // kept in memory to show the case of a continuously growing memory
     private final List<Product> products = new ArrayList<>();
     private double totalSales = 0;
+
+    private final ProductRepository productRepository;
+
+    @Autowired
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    @Transactional
+    public void insertSomeProducts() {
+        List<net.safedata.performance.training.domain.model.Product> productsToBeInserted = new ArrayList<>();
+        IntStream.rangeClosed(0, 100)
+                 .parallel() // low-hanging fruit --> always parallel
+                 .forEach(index -> productsToBeInserted.add(
+                         new net.safedata.performance.training.domain.model.
+                 Product(index, "The product " + index, 1000 * RANDOM.nextInt(50000))));
+
+        productRepository.saveAll(productsToBeInserted);
+    }
 
     /*
     @Scheduled(
