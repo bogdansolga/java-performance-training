@@ -18,13 +18,13 @@
 	<description>The project used for the 'Java performance' training</description>
 
 	<properties>
-		<java.version>21</java.version>
+		<java.version>17</java.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.github.gavlyukovskiy</groupId>
-			<artifactId>datasource-proxy-spring-boot-starter</artifactId>
+			<artifactId>p6spy-spring-boot-starter</artifactId>
 			<version>1.9.1</version>
 		</dependency>
 
