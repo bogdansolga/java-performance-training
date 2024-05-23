@@ -19,8 +19,9 @@ public class ParallelProcessing {
 
     public static void main(String[] args) {
         long now = System.currentTimeMillis();
+
         try {
-            ExecutorService executorService = Executors.newFixedThreadPool(CORES / 4);
+            ExecutorService executorService = Executors.newFixedThreadPool(CORES / 2);
             ExecutorCompletionService<Integer> executorCompletionService = new ExecutorCompletionService<>(executorService);
 
             for (int i=0; i <=20; i++) {

@@ -9,8 +9,11 @@ import org.springframework.util.StopWatch;
 
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Service
 public class ProductService {
@@ -22,6 +25,8 @@ public class ProductService {
     private static final Random RANDOM = new Random(20000);
 
     private static final Runtime RUNTIME = Runtime.getRuntime();
+
+    private static final int PROCESSORS_NUMBER = RUNTIME.availableProcessors();
 
     private final DecimalFormat decimalFormat = new DecimalFormat("#,###.#");
 
@@ -49,10 +54,12 @@ public class ProductService {
         LOGGER.info("JVM memory in use after: {} MB", memoryAfter);
     }
 
+    /*
     @Scheduled(
-            fixedRate = 5,
+            fixedRate = 20,
             timeUnit = TimeUnit.SECONDS
     )
+    */
     public void simulateProductsProcessingUsingAStopwatch() {
         System.out.println();
 
@@ -70,7 +77,7 @@ public class ProductService {
         stopWatch.stop();
 
         stopWatch.start("A long expensive task");
-        sleepALittle(5000);
+        CompletableFuture.runAsync(() -> sleepALittle(5000)); // executed on the ForkJoin pool
         stopWatch.stop();
 
         final long memoryAfter = getFreeMemoryInMB();
@@ -92,7 +99,10 @@ public class ProductService {
 
     private void generateProducts(int productsNumber) {
         IntStream.rangeClosed(0, productsNumber)
+                 .parallel() // low-hanging fruit --> always parallel
                  .forEach(index -> products.add(buildProduct(index)));
+
+        final Stream<Product> dynamicallyParallelStream = StreamSupport.stream(products.spliterator(), products.size() > 100);
     }
 
     //@Scheduled(fixedRate = 5000)
@@ -125,15 +135,12 @@ public class ProductService {
     }
 
     public List<Product> getALotOfProducts(final String productType, final String retrievingType) {
-        final long now = System.currentTimeMillis();
-
-        final int howMany = RANDOM.nextInt(30);
+        final int howMany = RANDOM.nextInt(70);
         final List<Product> products = new ArrayList<>(howMany);
         IntStream.range(0, howMany)
                  .peek(this::sleepALittle)
                  .forEach(index -> products.add(buildProduct(index)));
 
-        LOGGER.info("[{}] Returning {} {}s took {} ms", retrievingType, products.size(), productType, (System.currentTimeMillis() - now));
         return products;
     }
 
