@@ -7,7 +7,7 @@ logging:
 
   pattern:
     # special characters need to be escaped / quoted
-    console: '%clr([%date{HH:mm:ss.SSS}]){faint} %clr(%2p) %clr(%-40.40logger{36}){cyan} %m%n%wex'
+    console: '%clr([%thread] [%date{HH:mm:ss.SSS}]){faint} %clr(%2p) %clr(%-40.40logger{36}){cyan} %m%n%wex'
 
 server:
   tomcat:
@@ -16,9 +16,24 @@ server:
       min-spare: 2
 
 spring:
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@localhost:1521:xe
+    username: SYSTEM
+    password: dbpassword
+
   jackson:
     serialization:
       INDENT_OUTPUT : true
+
+  jpa:
+    hibernate:
+      ddl-auto: none # replace with 'create' for the first execution
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: true
+    database-platform: org.hibernate.dialect.OracleDialect
 
   jmx:
     default-domain: ' net.safedata.performance.training'
