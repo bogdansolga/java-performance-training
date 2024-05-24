@@ -136,14 +136,12 @@ public class ProductService {
     }
 
     //@Scheduled(fixedRate = 5000)
-    public void generateALotOfData() {
+    public void generateALotOfProducts() {
         final long memoryBefore = getFreeMemoryInMB();
         LOGGER.info("JVM memory in use before generating a lot of data: {} MB", memoryBefore);
 
-        final int productsNumber = 1_000_000;
-        final Set<Product> innerProducts = new HashSet<>(productsNumber);
-        generateProducts(productsNumber);
-        LOGGER.info("The products cost: {}", getProductsPriceSum(innerProducts));
+        generateProducts(1_000_000);
+        LOGGER.info("The cost of the current products is {}", getProductsPriceSum(products));
 
         final long memoryAfter = getFreeMemoryInMB();
         LOGGER.info("JVM memory in use after generating a lot of data: {} MB", memoryAfter);
