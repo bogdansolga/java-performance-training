@@ -1,5 +1,6 @@
 package net.safedata.performance.training.controller;
 
+import net.safedata.performance.training.domain.model.ProductEntity;
 import net.safedata.performance.training.model.Product;
 import net.safedata.performance.training.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +33,8 @@ public class ProductController {
     }
 
     @GetMapping
-    public List<net.safedata.performance.training.domain.model.Product> allProducts() {
-        return productService.getDatabaseProducts();
+    public List<ProductEntity> allProducts() {
+        return productService.getAllDatabaseProducts();
     }
 
     @GetMapping("/long/sync/{productType}")

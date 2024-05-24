@@ -1,12 +1,11 @@
 package net.safedata.performance.training.service;
 
+import net.safedata.performance.training.domain.model.ProductEntity;
 import net.safedata.performance.training.domain.repository.ProductRepository;
 import net.safedata.performance.training.model.Product;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -14,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
 
 import javax.sql.DataSource;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -33,8 +34,6 @@ public class ProductService {
 
     private static final Runtime RUNTIME = Runtime.getRuntime();
 
-    private static final int PROCESSORS_NUMBER = RUNTIME.availableProcessors();
-
     private final DecimalFormat decimalFormat = new DecimalFormat("#,###.#");
 
     // kept in memory to show the case of a continuously growing memory
@@ -50,25 +49,25 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    @EventListener(ApplicationReadyEvent.class)
+    //@EventListener(ApplicationReadyEvent.class)
     @Transactional
     public void insertSomeProducts() {
-        List<net.safedata.performance.training.domain.model.Product> productsToBeInserted = new ArrayList<>();
+        List<ProductEntity> productsToBeInserted = new ArrayList<>();
         IntStream.rangeClosed(0, 100)
                  .parallel() // low-hanging fruit --> always parallel
-                 .forEach(index -> productsToBeInserted.add(
-                         new net.safedata.performance.training.domain.model.
-                 Product(index, "The product " + index, 1000 * RANDOM.nextInt(50000))));
+                 .forEach(index -> productsToBeInserted.add(buildProductEntity(index)));
 
         productRepository.saveAll(productsToBeInserted);
     }
 
-    /*
+    private static ProductEntity buildProductEntity(int index) {
+        return new ProductEntity(index, "The product " + index, 1000 * RANDOM.nextInt(50000));
+    }
+
     @Scheduled(
-            fixedRate = 5,
+            fixedRate = 3,
             timeUnit = TimeUnit.SECONDS
     )
-    */
     public void simulateProductsProcessing() {
         System.out.println();
 
@@ -116,7 +115,7 @@ public class ProductService {
     }
 
     private void processALotOfProducts() {
-        final int productsNumber = RANDOM.nextInt(1000); //000
+        final int productsNumber = RANDOM.nextInt(50000); //000
         generateProducts(productsNumber);
 
         final double totalPrice = getProductsPriceSum(products);
@@ -131,7 +130,9 @@ public class ProductService {
                  .parallel() // low-hanging fruit --> always parallel
                  .forEach(index -> products.add(buildProduct(index)));
 
-        final Stream<Product> dynamicallyParallelStream = StreamSupport.stream(products.spliterator(), products.size() > 100);
+        @SuppressWarnings("unused")
+        final Stream<Product> dynamicallyParallelStream =
+                StreamSupport.stream(products.spliterator(), products.size() > 100);
     }
 
     //@Scheduled(fixedRate = 5000)
@@ -151,6 +152,7 @@ public class ProductService {
     private static double getProductsPriceSum(Collection<Product> products) {
         //TODO replace with StreamSupport.parallel
         return products.stream()
+                       .filter(Objects::nonNull)
                        .mapToDouble(Product::getPrice)
                        .sum();
     }
@@ -178,8 +180,8 @@ public class ProductService {
     }
 
     private Product buildProduct(final int index) {
-        sleepALittle(10);
-        return new Product(index, "The product " + index, 1000 * RANDOM.nextInt(50000));
+        //sleepALittle(10);
+        return new Product(index, "The product " + index, 1000 * RANDOM.nextInt(50000) + 10);
     }
 
     private void sleepALittle(final int bound) {
@@ -205,10 +207,13 @@ public class ProductService {
         }
     }
 
-    public List<net.safedata.performance.training.domain.model.Product> getDatabaseProducts() {
-        return jdbcTemplate.query("SELECT * FROM product", (rs, row) ->
-                new net.safedata.performance.training.domain.model.Product(rs.getInt("id"),
-                        rs.getString("name"), rs.getDouble("price")));
+    public List<ProductEntity> getAllDatabaseProducts() {
+        return jdbcTemplate.query("SELECT * FROM product", (rs, row) -> buildProductEntityFromResultSet(rs));
         //return productRepository.findAll();
+    }
+
+    private static ProductEntity buildProductEntityFromResultSet(ResultSet rs) throws SQLException {
+        return new ProductEntity(rs.getInt("id"), rs.getString("name"),
+                rs.getDouble("price"));
     }
 }
