@@ -3,21 +3,18 @@ package net.safedata.performance.training.config;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
+import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import java.util.Properties;
-
-//@Configuration
+@Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories("net.safedata.performance.training.domain.repository")
 @EntityScan("net.net.safedata.performance.training.domain.model")
+@ConditionalOnBooleanProperty(name = "custom-datasource", havingValue = true)
 public class PersistenceConfig {
 
     private static final int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
@@ -55,18 +52,5 @@ public class PersistenceConfig {
     @Bean(destroyMethod = "close")
     public HikariDataSource getDataSource(HikariConfig hikariConfig) {
         return new HikariDataSource(hikariConfig);
-    }
-
-    @Bean(name = "entityManagerFactory")
-    public LocalSessionFactoryBean sessionFactory() {
-        final LocalSessionFactoryBean localSessionFactoryBean = new LocalSessionFactoryBean();
-        localSessionFactoryBean.setAnnotatedPackages("net.safedata.performance.training.domain.model");
-        localSessionFactoryBean.setDataSource(dataSource());
-
-        Properties properties = new Properties();
-        properties.setProperty("jakarta.persistence.jdbc.url", "org.hibernate.dialect.OracleDialect");
-
-        localSessionFactoryBean.setHibernateProperties(properties);
-        return localSessionFactoryBean;
     }
 }
