@@ -1,0 +1,9 @@
+-server
+-Xms256m
+-Xmx256m
+-XX:+UseSerialGC
+-XX:ParallelGCThreads=4
+-XX:+UseAdaptiveSizePolicy
+-XX:ReservedCodeCacheSize=256M
+-XX:CompileThreshold=2000
+-XX:+UseDynamicNumberOfCompilerThreads
