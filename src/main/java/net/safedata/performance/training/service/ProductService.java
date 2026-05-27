@@ -55,10 +55,11 @@ public class ProductService {
     //@EventListener(ApplicationReadyEvent.class)
     @Transactional
     public void insertSomeProducts() {
-        List<ProductEntity> productsToBeInserted = new ArrayList<>();
-        IntStream.rangeClosed(0, 100)
-                 .parallel() // low-hanging fruit --> always parallel
-                 .forEach(index -> productsToBeInserted.add(buildProductEntity(index)));
+        final List<ProductEntity> productsToBeInserted =
+                IntStream.rangeClosed(0, 100)
+                         .parallel() // low-hanging fruit --> always parallel
+                         .mapToObj(ProductService::buildProductEntity)
+                         .toList();
 
         productRepository.saveAll(productsToBeInserted);
     }
@@ -122,17 +123,20 @@ public class ProductService {
         final int productsNumber = RANDOM.nextInt(50000); //000
         generateProducts(productsNumber);
 
-        final double totalPrice = getProductsPriceSum(products);
-        LOGGER.info("The total price of {} products is {}", products.size(), decimalFormat.format(totalPrice));
+        final List<Product> snapshot = List.copyOf(products);
+        final double totalPrice = getProductsPriceSum(snapshot);
+        LOGGER.info("The total price of {} products is {}", snapshot.size(), decimalFormat.format(totalPrice));
 
         totalSales += totalPrice;
         LOGGER.info("The total sales is currently {}", decimalFormat.format(totalSales));
     }
 
     private void generateProducts(int productsNumber) {
-        IntStream.rangeClosed(0, productsNumber)
-                 .parallel() // low-hanging fruit --> always parallel
-                 .forEach(index -> products.add(buildProduct(index)));
+        final List<Product> generated = IntStream.rangeClosed(0, productsNumber)
+                                                 .parallel() // low-hanging fruit --> always parallel
+                                                 .mapToObj(this::buildProduct)
+                                                 .toList();
+        products.addAll(generated);
 
         @SuppressWarnings("unused")
         final Stream<Product> dynamicallyParallelStream =
