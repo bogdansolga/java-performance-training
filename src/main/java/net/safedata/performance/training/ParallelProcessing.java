@@ -20,17 +20,16 @@ public class ParallelProcessing {
     public static void main(String[] args) {
         long now = System.currentTimeMillis();
 
-        try {
-            ExecutorService executorService = Executors.newFixedThreadPool(CORES / 2);
+        try (ExecutorService executorService = Executors.newFixedThreadPool(CORES / 2)) {
             ExecutorCompletionService<Integer> executorCompletionService = new ExecutorCompletionService<>(executorService);
 
-            for (int i=0; i <=20; i++) {
+            for (int i = 0; i <= 20; i++) {
                 // forking - sending tasks to be processed in parallel
                 executorCompletionService.submit(new DepositStockComputeTask());
             }
 
             Set<Integer> stocks = new HashSet<>();
-            for (int i=0; i <=20; i++) {
+            for (int i = 0; i <= 20; i++) {
                 final Future<Integer> future = executorCompletionService.poll(100, TimeUnit.MILLISECONDS);
                 if (future != null && future.isDone() && !future.isCancelled()) {
                     // joining

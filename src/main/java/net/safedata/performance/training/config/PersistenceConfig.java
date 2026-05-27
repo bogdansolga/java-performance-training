@@ -8,12 +8,15 @@ import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import javax.sql.DataSource;
 
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories("net.safedata.performance.training.domain.repository")
-@EntityScan("net.net.safedata.performance.training.domain.model")
+@EntityScan("net.safedata.performance.training.domain.model")
 @ConditionalOnBooleanProperty(name = "custom-datasource", havingValue = true)
 public class PersistenceConfig {
 
@@ -52,5 +55,10 @@ public class PersistenceConfig {
     @Bean(destroyMethod = "close")
     public HikariDataSource getDataSource(HikariConfig hikariConfig) {
         return new HikariDataSource(hikariConfig);
+    }
+
+    @Bean
+    public JdbcTemplate getJdbcTemplate(DataSource dataSource) {
+        return new JdbcTemplate(dataSource);
     }
 }

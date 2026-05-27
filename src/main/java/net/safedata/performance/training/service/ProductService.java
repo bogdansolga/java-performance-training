@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
@@ -42,11 +43,13 @@ public class ProductService {
 
     private final JdbcTemplate jdbcTemplate;
     private final ProductRepository productRepository;
+    private final ThreadPoolTaskExecutor executor;
 
     @Autowired
-    public ProductService(DataSource dataSource, ProductRepository productRepository) {
+    public ProductService(DataSource dataSource, ProductRepository productRepository, ThreadPoolTaskExecutor executor) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.productRepository = productRepository;
+        this.executor = executor;
     }
 
     //@EventListener(ApplicationReadyEvent.class)
@@ -65,7 +68,7 @@ public class ProductService {
     }
 
     @Scheduled(
-            fixedRate = 3,
+            fixedRate = 120,
             timeUnit = TimeUnit.SECONDS
     )
     public void simulateProductsProcessing() {
@@ -80,14 +83,15 @@ public class ProductService {
 
         final long memoryAfter = getFreeMemoryInMB();
         LOGGER.info("JVM memory in use after: {} MB", memoryAfter);
+
+        // custom thread pool usage example
+        executor.execute(() -> LOGGER.info("JVM memory in use after: {} MB", memoryAfter));
     }
 
-    /*
     @Scheduled(
             fixedRate = 20,
             timeUnit = TimeUnit.SECONDS
     )
-    */
     public void simulateProductsProcessingUsingAStopwatch() {
         System.out.println();
 
