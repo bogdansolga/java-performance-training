@@ -31,7 +31,7 @@ public class ProductService {
 
     private static final long BYTES_IN_MB = 1048576;
 
-    private static final Random RANDOM = new Random(20000);
+    private static final Random RANDOM = new Random(1);
 
     private static final Runtime RUNTIME = Runtime.getRuntime();
 
@@ -120,7 +120,7 @@ public class ProductService {
     }
 
     private void processALotOfProducts() {
-        final int productsNumber = RANDOM.nextInt(50000); //000
+        final int productsNumber = RANDOM.nextInt(5); //000
         generateProducts(productsNumber);
 
         final List<Product> snapshot = List.copyOf(products);
@@ -191,7 +191,7 @@ public class ProductService {
     }
 
     private void sleepALittle(final int bound) {
-        //if (true) return; //TODO uncomment to add some processing time
+        if (true) return; //TODO uncomment to remove the processing time
         try {
             Thread.sleep(RANDOM.nextInt(Math.abs(bound) + 10));
         } catch (InterruptedException e) {
