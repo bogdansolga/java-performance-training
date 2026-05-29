@@ -17,9 +17,11 @@ import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -106,11 +108,11 @@ public class ProductService {
         stopWatch.stop();
 
         stopWatch.start("A short expensive task");
-        sleepALittle(200);
+        simulateProcessingDelay(200);
         stopWatch.stop();
 
         stopWatch.start("A long expensive task");
-        CompletableFuture.runAsync(() -> sleepALittle(5000)); // executed on the ForkJoin pool
+        CompletableFuture.runAsync(() -> simulateProcessingDelay(5000)); // executed on the ForkJoin pool
         stopWatch.stop();
 
         final long memoryAfter = getFreeMemoryInMB();
@@ -175,7 +177,7 @@ public class ProductService {
         final int howMany = RANDOM.nextInt(70);
         final List<Product> products = new ArrayList<>(howMany);
         IntStream.range(0, howMany)
-                 .peek(this::sleepALittle)
+                 .peek(this::simulateProcessingDelay)
                  .forEach(index -> products.add(buildProduct(index)));
 
         return products;
@@ -186,17 +188,15 @@ public class ProductService {
     }
 
     private Product buildProduct(final int index) {
-        //sleepALittle(10);
+        //simulateProcessingDelay(10);
         return new Product(index, "The product " + index, 1000 * RANDOM.nextInt(50000) + 10);
     }
 
-    private void sleepALittle(final int bound) {
-        if (true) return; //TODO uncomment to remove the processing time
-        try {
-            Thread.sleep(RANDOM.nextInt(Math.abs(bound) + 10));
-        } catch (InterruptedException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
+    private void simulateProcessingDelay(final int maxDelayMillis) {
+        // Simulate processing latency without burning CPU: parkNanos blocks the
+        // thread without spinning and does not throw InterruptedException.
+        final int delayMillis = RANDOM.nextInt(Math.abs(maxDelayMillis) + 10);
+        LockSupport.parkNanos(Duration.ofMillis(delayMillis).toNanos());
     }
 
     @SuppressWarnings("unused")
