@@ -33,7 +33,7 @@ public class ProductService {
 
     private static final long BYTES_IN_MB = 1048576;
 
-    private static final Random RANDOM = new Random(1);
+    private static final Random RANDOM = new Random(5000);
 
     private static final Runtime RUNTIME = Runtime.getRuntime();
 
@@ -122,7 +122,7 @@ public class ProductService {
     }
 
     private void processALotOfProducts() {
-        final int productsNumber = RANDOM.nextInt(5); //000
+        final int productsNumber = RANDOM.nextInt(5000); //000
         generateProducts(productsNumber);
 
         final List<Product> snapshot = List.copyOf(products);
@@ -145,7 +145,7 @@ public class ProductService {
                 StreamSupport.stream(products.spliterator(), products.size() > 100);
     }
 
-    //@Scheduled(fixedRate = 5000)
+    //@Scheduled(fixedRate = 10000)
     public void generateALotOfProducts() {
         final long memoryBefore = getFreeMemoryInMB();
         LOGGER.info("JVM memory in use before generating a lot of data: {} MB", memoryBefore);

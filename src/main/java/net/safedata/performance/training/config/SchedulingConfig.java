@@ -11,7 +11,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
 @EnableScheduling
-@ConditionalOnBooleanProperty(name = "scheduling.enabled", havingValue = true)
+//@ConditionalOnBooleanProperty(name = "scheduling.enabled", havingValue = true)
 public class SchedulingConfig {
 
     private static final int PROCESSORS_COUNT = Runtime.getRuntime().availableProcessors();

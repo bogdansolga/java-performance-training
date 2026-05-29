@@ -73,4 +73,10 @@ public class Product extends AbstractEntity {
 
         return sb.toString();
     }
+
+    @Override
+    protected void finalize() throws Throwable {
+        System.err.println("Pay a lot of attention to the finalize method");
+        super.finalize();
+    }
 }
