@@ -38,18 +38,39 @@ while IFS= read -r line; do
     [ -n "$anchor" ] || continue
     [ "$anchor" = "Anchor" ] && continue
 
+    cat="$(printf '%s' "$line" | awk -F'|' '{print $6}' \
+           | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+
+    # Category may declare an expected occurrence count via an `xN` token
+    # (e.g. "correction x2"), for anchors that legitimately repeat verbatim
+    # across slides and are meant to be fixed everywhere in one global
+    # replace. No token present => expected count is 1 (default behaviour).
+    expected=1
+    xtoken="$(printf '%s' "$cat" | grep -oE 'x[0-9]+' | head -1)"
+    [ -n "$xtoken" ] && expected="${xtoken#x}"
+
+    # NOTE: this relies on the script NOT running under `set -e`. Under
+    # `pipefail` alone, `grep -o` exiting 1 on zero matches only affects the
+    # pipeline's overall status, which we don't check here — we only read
+    # the captured stdout (empty on no match) via `wc -l`. Adding `set -e`
+    # would abort the script here on a legitimate MISSING before it can be
+    # reported. Do not add `set -e` to this script.
     count="$(grep -o -F -- "$anchor" "$DECK_TEXT" | wc -l | tr -d '[:space:]')"
     if [ "$count" -eq 0 ]; then
         echo "MISSING  $anchor"
         missing=$((missing + 1))
         rc=1
-    elif [ "$count" -gt 1 ]; then
+    elif [ "$count" -eq "$expected" ]; then
+        echo "ok       $anchor"
+        found=$((found + 1))
+    elif [ "$expected" -eq 1 ]; then
         echo "AMBIGUOUS ($count hits)  $anchor"
         missing=$((missing + 1))
         rc=1
     else
-        echo "ok       $anchor"
-        found=$((found + 1))
+        echo "COUNT MISMATCH (found $count, expected $expected)  $anchor"
+        missing=$((missing + 1))
+        rc=1
     fi
 done < "$DOC"
 
