@@ -38,7 +38,7 @@ while IFS= read -r line; do
     [ -n "$anchor" ] || continue
     [ "$anchor" = "Anchor" ] && continue
 
-    count="$(grep -F -c -- "$anchor" "$DECK_TEXT" || true)"
+    count="$(grep -o -F -- "$anchor" "$DECK_TEXT" | wc -l | tr -d '[:space:]')"
     if [ "$count" -eq 0 ]; then
         echo "MISSING  $anchor"
         missing=$((missing + 1))
