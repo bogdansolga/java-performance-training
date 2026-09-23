@@ -25,6 +25,7 @@ while IFS= read -r line; do
     [ -n "$anchor" ] || continue
     [ "$anchor" = "Anchor" ] && continue
     case "$cat" in *skip*) echo "skip     $anchor"; continue ;; esac
+    case "$cat" in *manual*) echo "skip     $anchor (manual)"; continue ;; esac
     [ -n "$repl" ] && [ "$repl" != "n/a" ] || { echo "skip     $anchor (no replacement)"; continue; }
 
     if [ "$DRY" = "--dry-run" ]; then
@@ -52,6 +53,7 @@ while IFS= read -r line; do
     cat="$(printf '%s' "$line" | awk -F'|' '{print $6}' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
     [ -n "$anchor" ] && [ "$anchor" != "Anchor" ] || continue
     case "$cat" in *skip*) continue ;; esac
+    case "$cat" in *manual*) continue ;; esac
     [ -n "$repl" ] && [ "$repl" != "n/a" ] || continue
 
     if grep -F -q -- "$anchor" "$DECK_TEXT"; then
