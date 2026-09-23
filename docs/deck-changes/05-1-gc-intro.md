@@ -1,5 +1,10 @@
 # Deck 5.1 — An introduction to Garbage Collection
 
+> **STATUS: APPLIED 2026-09-23** — the 6 automatable rows were applied to the live deck and verified.
+> **DO NOT RE-RUN `deck-apply.sh` ON THIS FILE.** Three rows are append-style (the replacement text
+> contains the anchor), so a second run would match the anchor inside the already-updated text and
+> append again, producing doubled sentences. The 3 `manual` rows remain outstanding — see Manual actions.
+
 Source read: `gslides.sh personal text 1Y2xjPThug1WM2haytVv8M64tQDAIkI8TFl5CO4FU2lc` on 2026-09-23, saved to `/tmp/deck-5-1.txt` (1026 lines, 44 slides, slide indices 0–43).
 
 All anchors below were re-derived from that live read (see Notes). Every anchor in the task-2 brief turned out to be wrong in some way — a paraphrase that doesn't exist verbatim, a multi-line span, or attached to the wrong slide number. See the report for the full list.
