@@ -46,8 +46,8 @@ while IFS= read -r line; do
     # across slides and are meant to be fixed everywhere in one global
     # replace. No token present => expected count is 1 (default behaviour).
     expected=1
-    xtoken="$(printf '%s' "$cat" | grep -oE 'x[0-9]+' | head -1)"
-    [ -n "$xtoken" ] && expected="${xtoken#x}"
+    xtoken="$(printf '%s' "$cat" | grep -oE '(^|[[:space:],])x[0-9]+' | head -1)"
+    [ -n "$xtoken" ] && expected="${xtoken##*x}"
 
     # NOTE: this relies on the script NOT running under `set -e`. Under
     # `pipefail` alone, `grep -o` exiting 1 on zero matches only affects the
