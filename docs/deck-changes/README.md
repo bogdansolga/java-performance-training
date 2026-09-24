@@ -49,7 +49,7 @@ on zero hits, and `COUNT MISMATCH` naming both numbers otherwise.
 |---|---|---|
 | 5.1 Intro to GC | `05-1-gc-intro.md` | applied 2026-09-23 |
 | 4.2 JIT compiler | `04-2-jit.md` | applied 2026-09-24 |
-| 7.1 Monitoring & profiling | `07-1-profiling-tools.md` | not started |
+| 7.1 Monitoring & profiling | `07-1-profiling-tools.md` | applied 2026-09-24 |
 | 5.2 Choosing a GC | `05-2-choosing-gc.md` | not started |
 | 5.3 Basic GC tuning | `05-3-gc-tuning.md` | not started |
 | 6.1 Largest heap objects | `06-1-heap-objects.md` | not started |
