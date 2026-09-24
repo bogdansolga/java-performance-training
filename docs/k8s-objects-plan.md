@@ -37,10 +37,18 @@ largest line in the budget.
 | RabbitMQ *(optional)* | 128 Mi | 256 Mi | Only if the async lesson is wanted |
 | **Total** | | **~2.4 Gi** | Comfortable inside a 4 GB `.wslconfig` cap |
 
-Without the broker it is ~2.1 Gi. Both fit the 4 GB WSL2 cap from the setup plan, leaving headroom
-for Windows, an IDE and the JVM the participant is profiling **outside** the cluster.
+The default set is **~2.1 Gi** — the broker is shipped but not applied. With it, ~2.4 Gi. Both fit
+the 4 GB WSL2 cap from the setup plan, leaving headroom for Windows, an IDE and the JVM the
+participant is profiling **outside** the cluster.
 
-## 3. Message broker — Solace is not viable locally
+## 3. Message broker — infrastructure only, and Solace is not viable locally
+
+**Decided: the broker is not a lesson.** It exists only as *the system that handles async
+messages*, so a participant with an async-shaped application recognises their own architecture.
+Nothing in the course teaches the broker, measures it, or tunes it. The manifest ships so a full
+setup is available on request; it is not applied by default.
+
+That lowers the bar considerably — the broker only has to start, accept a message and hand it on.
 
 | Broker | Minimum | Runtime | Verdict |
 |---|---|---|---|
@@ -56,8 +64,9 @@ Two reasons for RabbitMQ over Kafka here, beyond size:
 2. RabbitMQ is roughly a quarter of Kafka's footprint.
 
 Solace matches their production stack, which is the argument for it — but at 3.4 GiB minimum it
-cannot coexist with k3s, Postgres and the app on a laptop. Recommend demonstrating the *pattern*
-with RabbitMQ and saying plainly that Solace is the same shape at a size that needs a server.
+cannot coexist with k3s, Postgres and the app on a laptop. Since the broker is scenery rather than
+subject, RabbitMQ serves the purpose at a fraction of the cost. Worth saying in the room that
+Solace is the same shape at a size that needs a server, so nobody assumes we avoided it by accident.
 
 ## 4. What we reuse from the capstone, and what we cut
 
@@ -78,6 +87,11 @@ Net: **11 manifest files → 5**, and one of those is optional.
 
 ## 5. The object set
 
+**Every workload is `replicas: 1`** — the app, Postgres and RabbitMQ alike. Two replicas halve the
+memory available per pod, double the control-plane bookkeeping and introduce "which pod am I
+looking at?" during a measurement. Note when copying from the capstone: its manifests use
+`replicas: 2`, and that is the one value to change.
+
 ```
 k8s/
   00-namespace.yaml      Namespace
@@ -85,7 +99,7 @@ k8s/
   20-jvm-config.yaml     ConfigMap  <- the only file participants edit
   30-app.yaml            workload + Service (requests == limits == 1Gi)
   40-load-job.yaml       Job
-  50-rabbitmq.yaml       optional, only if the async lesson is in scope
+  50-rabbitmq.yaml       shipped, not applied by default — async scenery for a full setup
 ```
 
 `20-jvm-config.yaml` is the whole point — participants change one value and re-apply:
@@ -124,7 +138,7 @@ OOMKill — that is why `emptyDir` is sufficient in §4.
 
 ## 7. Open questions
 
-- Is the async/broker lesson in scope at all? If not, drop `50-rabbitmq.yaml` and the budget falls to ~2.1 Gi. Given the workshop is about Java performance and the schedule already carries 6–7 hours of labs, dropping it is defensible.
-- SQL Server was mentioned as unlikely. Confirm Postgres only — SQL Server's container wants ~2 GB on its own and would blow the budget as thoroughly as Solace.
+- ~~Is the async/broker lesson in scope?~~ **Settled: no.** The broker is scenery only; the manifest ships unapplied.
+- ~~Confirm Postgres only?~~ **Settled: Postgres only.** SQL Server is out — its container wants ~2 GB alone and would blow the budget as thoroughly as Solace.
 - Do participants build the app image locally, or do we publish one as the capstone does with `bogdansolga/skyhop-be`? Publishing avoids a slow first build; building avoids a registry dependency.
 - Does this run as part of lab 9, or as a trainer-only demo? Lab 9 itself still needs no cluster.
