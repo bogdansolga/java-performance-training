@@ -49,10 +49,10 @@ Free, no-company-size-limit options on Windows, all working through **WSL2** (bu
 
 | Option | Licence | Gives you | Notes |
 |---|---|---|---|
-| **Rancher Desktop** | Apache 2.0, free at any size | Container runtime **and k3s**, GUI | Bundles k3s in its own WSL2 distro; provides the `docker` CLI via dockerd/moby |
+| **k3s inside WSL2** | Apache 2.0, free | Kubernetes, no Docker at all | **Lightest.** A few hundred MB. Enable systemd in `/etc/wsl.conf`, then `curl -sfL https://get.k3s.io \| sh -` |
+| Rancher Desktop | Apache 2.0, free at any size | Container runtime **and k3s**, GUI | **~2 GB idle, 4 GB default VM.** See §4c — too heavy for this classroom |
 | **Podman Desktop** | Free at any size | Container runtime, GUI | Docker-compatible CLI, daemonless/rootless. No bundled Kubernetes |
 | **Docker Engine (CE) inside WSL2** | Apache 2.0, free | Container runtime | The subscription applies to Docker *Desktop*, not the engine. No GUI |
-| **k3s inside WSL2** | Apache 2.0, free | Kubernetes, no Docker at all | Enable systemd in `/etc/wsl.conf`, then `curl -sfL https://get.k3s.io \| sh -` |
 | Docker Desktop | **Paid** at their size | Everything | Assume unavailable |
 
 **k3s and k0s become genuinely viable on Windows in a way they are not on macOS**, because WSL2
@@ -79,25 +79,64 @@ docker run --rm --memory=2g ...        Rancher Desktop or Docker CE in WSL2
 Teaches what only a cluster shows: `requests` vs `limits`, `OOMKilled`, exit code 137, restart
 loops, `kubectl top pod`.
 
-**Rancher Desktop collapses Tiers 1 and 2 into a single free install** — it ships a container
-runtime *and* k3s in one WSL2 distribution, with `kubectl` on the Windows path. That is the
-strongest argument for it over Podman Desktop, which has no bundled Kubernetes.
+**Use bare k3s inside WSL2, not Rancher Desktop** — see §4c. Rancher Desktop would collapse
+Tiers 1 and 2 into one install, but at a memory cost this particular classroom cannot afford.
 
-Fallback for locked-down machines that permit WSL2 but not a desktop app: install k3s directly
-inside a WSL2 Ubuntu. No GUI, no Docker, fully free.
+```
+wsl --install -d Ubuntu
+# in /etc/wsl.conf:  [boot]  systemd=true
+wsl --shutdown
+curl -sfL https://get.k3s.io | sh -
+```
 
 ### Tier 3 — Solace and a database. **Proposed out of scope.**
 
 Case B needs a broker, a database and a load source — a day of setup for a lab we have not scoped,
 on a schedule already at 6–7 hours of labs inside 17 hours of content.
 
+## 4c. Memory budget — why not Rancher Desktop
+
+The trainer's instinct that Rancher Desktop is heavier than k3s is correct, and the gap is large
+enough to decide the question:
+
+| | Idle | Under load |
+|---|---|---|
+| **Bare k3s in WSL2** | a few hundred MB; runs on a 2 GB VPS | control plane ~500 MB–1.5 GB |
+| **Rancher Desktop** | **~2 GB**, on a 4 GB default VM | 2.9 GB for a six-service stack; 4–8 GB for heavier Kubernetes work |
+
+Two reasons this matters more here than it would elsewhere:
+
+**1. Lab 9's entire subject is a 2 GB memory ceiling.** Running a tool that idles at ~2 GB, on a
+laptop, while teaching what happens when a 2 GB limit is exceeded, spends the very resource the
+lesson is about. On a 16 GB corporate laptop also running an IDE and the JVM under test, that is a
+bad classroom.
+
+**2. WSL2 defaults to half the host's RAM**, and all WSL2 distributions share one pool. There are
+documented reports of container workloads on Windows/WSL2 escalating to ~99% of RAM and freezing the
+machine when no cap is set. Rancher Desktop runs in its own *additional* `rancher-desktop` distro,
+competing with any Ubuntu distro a participant already has.
+
+**Therefore, if WSL2 is used at all, capping it is a mandatory prerequisite step**, not advice:
+
+```ini
+# %USERPROFILE%\.wslconfig
+[wsl2]
+memory=4GB
+processors=2
+```
+
+This belongs in `preflight.ps1` and in `PREREQUISITES.md`. Freezing a participant's laptop on day
+one is a worse outcome than skipping the Kubernetes tier entirely.
+
 ## 5. Recommendation
 
 - **Tier 0 required.** Lab 9 needs nothing but the JDK. This is the single most valuable thing the
   course hands them: the participant who said case A was *hard to reproduce locally* gets a one-line
   `java -Xmx2g` that reproduces it on their own Windows laptop.
-- **Tier 1 + 2 via Rancher Desktop**, recommended but **not a hard prerequisite**. One free install
-  covers both, and it is the option least likely to hit a licensing or procurement wall.
+- **Tier 1 + 2 via bare k3s in WSL2**, optional and **not a hard prerequisite**. Lightest of the
+  free options, no licensing exposure, and no second WSL2 distro competing for the shared pool.
+  Podman Desktop is the alternative if a GUI is wanted for Tier 1 alone.
+- **A `.wslconfig` memory cap is mandatory wherever WSL2 is used**, per §4c.
 - **Tier 3 scoped out**, said out loud in the session.
 
 Deliverables if approved: one `Dockerfile`, one `k8s/lab9-humongous.yaml`, and a short README
