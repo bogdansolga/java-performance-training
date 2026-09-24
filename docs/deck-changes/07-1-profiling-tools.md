@@ -1,6 +1,9 @@
 # Deck 7.1 — Java monitoring & profiling tools
 
-**STATUS: DRAFT — not yet applied.** Steps 1–3 only (read, write, check). Step 4 (trainer approval
+**STATUS: APPLIED 2026-09-24** — the 6 scripted rows are on the live deck and independently
+> verified. The manual rows are tracked in MANUAL-ACTIONS.md. Do not re-run deck-apply.sh.
+>
+> ~~STATUS: DRAFT — not yet applied.~~ Steps 1–3 only (read, write, check). Step 4 (trainer approval
 gate), Step 5 (`deck-apply.sh`), Step 6 (image placement), Step 7 (re-read / GlassFish sweep) and
 Step 8 (README index update) intentionally **not done** by this pass — out of scope per Task 5
 brief's scope limit. `deck-apply.sh` was never invoked; the live deck was never modified.

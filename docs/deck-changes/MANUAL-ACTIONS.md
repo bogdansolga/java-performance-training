@@ -87,3 +87,78 @@ not a correctness issue.
 The version badge lists **only the releases where the claim holds** — `[11 · 17]`, `[21 · 25]`,
 `[25]`. Plain text, no colour. The earlier full-set-with-muted-colours form was dropped because it
 would have required a hand styling pass on every badged slide across the deck set.
+
+---
+
+## Deck 7.1 — Java monitoring & profiling tools
+
+Presentation: https://docs.google.com/presentation/d/1952R9NhvuYNuG9TujMfEPpy_w6cZ_yfMvl5zlZb9yoU/edit
+
+The 6 scripted rows were applied on 2026-09-24 and verified. These are what the tool cannot do.
+
+**6. Slide 1 — delete the `jhat` entry**
+
+Remove both runs: the tool name `jhat` and its description `- reads and helps analyse memory heap
+dumps`. `jhat` was removed in JDK 9.
+Not scriptable: the name and description are two separate text runs.
+Source: https://openjdk.org/jeps/241
+
+**7. Slide 16 — replace the `jhat` mention**
+
+Change "JDK tools - including visualvm & jhat" to "JDK tools - including visualvm; for heap dumps
+use `jcmd <pid> GC.heap_dump`, then open in JMC or Eclipse MAT".
+Not scriptable: the bare `jhat` run here is **byte-identical to slide 1's**, but the two need
+different fixes — a whole-deck replace would give them the same text.
+Source: https://openjdk.org/jeps/241
+
+**8. Slide 18 — move Java Flight Recorder from the Paid list to the Free list**
+
+Place it alongside JMC, VisualVM and async-profiler. JFR has been free and open-source since
+JDK 11 (JEP 328); it was a commercial feature only under Oracle JDK 8, which is likely why the
+deck lists it as paid. Java 11 is a covered release, so it should read free throughout.
+Not scriptable: the string `Java Flight Recorder` also appears **correctly** in slide 42's link
+caption, which a whole-deck replace would corrupt.
+Source: https://openjdk.org/jeps/328
+
+**9. Slide 18 — delete the stale parenthetical after `JProbe`**
+
+Remove "(deprecated by the developing company?)". The JProbe line now states the status outright,
+so the hedge is redundant.
+Not scriptable: three text runs, and a genuine deletion.
+
+**10. Slide 37 — rewrite the native-profiler line**
+
+Change "→ GlassFish startup in Oracle Developer Studio → native profiler" to
+"→ native profiling of a Java process, using async-profiler or perf →". Oracle Developer Studio is
+discontinued; async-profiler samples without waiting for a safepoint, which is exactly the bias
+this deck describes on slide 31.
+Not scriptable: three text runs.
+Source: https://github.com/async-profiler/async-profiler
+
+**11. Slide 38 — rewrite the native-profile caption**
+
+Change "The GlassFish startup profile, showed in Oracle Developer Studio profiling tool" to
+"A native CPU profile, captured with async-profiler / perf", and delete the now-redundant
+"Also works on Linux systems" line.
+Not scriptable: three text runs, and `Oracle Developer Studio` occurs twice needing different
+surrounding rewrites.
+
+**12. Place the three approved diagrams** (2560x1440, in `docs/diagrams/`)
+
+- `7-1-01-sampling-vs-instrumenting.png` → **slide 24**, replacing the sampling screenshot
+- `7-1-02-safepoint-bias.png` → **slide 31**, adding to a prose-only explanation
+- `7-1-03-complementarity.png` → **slide 29**, adding to a prose-only comparison
+
+**13. Delete the superseded screenshots** on slides **24, 27, 34, 38, 40**
+
+Slide 40 has no text row above it — its screenshot is cut because it belongs to the same
+walkthrough, not because its caption was wrong.
+
+**14. Shortening pass — merge or cut 4 slides**
+
+- **26** "Quick summary" (sampling) → merge into 24/25; the deck already has summaries at 12 and 41
+- **33** "Instrumented profilers:" → merge into 32 "Conclusions"; both are short recaps of one example
+- **36** "Quick summary" (blocking methods) → merge into 35
+- **40** "The filtered native profiler" → cut; a third pass over a screenshot being deleted
+
+44 slides today → ~40 after these. A further reduction pass is in progress separately.
