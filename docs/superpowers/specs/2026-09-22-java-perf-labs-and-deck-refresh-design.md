@@ -64,9 +64,10 @@ Deck modernization is both the **top priority and the harder half**. Reviewing, 
 | 3 Lock contention | 1h |
 | 5 GC mismatch | 2h |
 | 8 Code cache exhaustion | 1h |
-| **Total** | **5–6h (~29–35%)** |
+| 9 Humongous allocations | 1h |
+| **Total** | **6–7h (~35–41%)** |
 
-Lab 5 might get two hours, because it sweeps three collectors across three JVMs. Fallback - 1h, with just one collector. The remaining ~11–12h covers the deck sections, which requires decks 2/2.1–2.4 and 3/3.1–3.4 to be reviewed, refined and reduced (§6.4).
+Lab 5 might get two hours, because it sweeps three collectors across three JVMs. Fallback - 1h, with just one collector. The remaining ~10–11h covers the deck sections, which requires decks 2/2.1–2.4 and 3/3.1–3.4 to be reviewed, refined and reduced (§6.4).
 
 ## 6. Workstream 1 — deck modernization
 
@@ -198,8 +199,11 @@ CMS and elastic Metaspace matter most. CMS because deck 5.1 devotes several slid
 | 3 | Lock contention on `getSynchronizedProducts` | Yes | p90 under load; JFR *Monitor blocked* | threading | capture |
 | 5 | GC mismatch — Serial (current default in `vm-options.txt`) vs G1 vs ZGC | Flags present | Pause distribution + p90 | 5.1–5.3 | capture |
 | 8 | Code cache exhaustion via reduced `-XX:ReservedCodeCacheSize` | Flag present | Throughput cliff; JFR compilation events | 4.2 | capture |
+| 9 | **G1 humongous allocations** — oversized responses under a small heap | No | Humongous region count from `-Xlog:gc+heap`; full-GC frequency | 5.1, 5.3 | capture + count |
 
 Deferred to backlog: ForkJoinPool common-pool saturation, allocation pressure, `ThreadLocal` leak on pooled threads.
+
+**Lab 9 (humongous allocations) is the sixth delivered lab**, added after a participant pre-call (`docs/k8s-prep-work.md`) surfaced it as a live production failure: a 2 GB Cloud Run container, 5-6 MB responses, G1's default ~1 MB region size, sawtooth logs and repeated kills. It is the strongest case the course has — small cause, dramatic symptom, invisible without the right tool, and explicitly described as *hard to reproduce locally*, which is the skill the labs exist to build. An object larger than half a G1 region is allocated directly into old gen; the fix is usually `-XX:G1HeapRegionSize` or smaller responses.
 
 Lab 8 matters beyond its own session. Per the revised §6.3, the 32-bit JIT content is **retained and scoped to "Java 17 and prior"** rather than removed, so lab 8 is no longer a replacement for it — it is the *current-LTS* JIT failure mode sitting alongside the historical material, giving deck 4.2 something demonstrable on 21 and 25.
 

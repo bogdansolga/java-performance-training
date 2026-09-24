@@ -797,6 +797,8 @@ S="/Users/bogdan/.claude/plugins/cache/nix-config/nix/1.0.2/scripts/gslides.sh"
 | 25 | -XX:+UseParallelOldGC | controlling parallelism | -XX:+UseParallelGC (UseParallelOldGC deprecated in JDK 14) | correction | https://openjdk.org/jeps/366 |
 | 25 | -XX:+UseParNewGC | controlling parallelism | (removed - UseParNewGC went with CMS) | removal | https://openjdk.org/jeps/363 |
 | 34 | Summary | summary slide | Compact object headers (-XX:+UseCompactObjectHeaders, product in JDK 25) cut heap by up to 22% | addition | https://openjdk.org/jeps/519 |
+| — | (locate the G1 region / generation-sizing slide) | G1 heap regions | **Humongous allocations**: an object larger than half a G1 region goes straight to old gen. Default region size scales with heap (~1 MB at a 2 GB heap), so multi-MB responses become humongous. Tune with -XX:G1HeapRegionSize | addition | https://docs.oracle.com/en/java/javase/21/gctuning/garbage-first-g1-garbage-collector1.html |
+| — | (same slide or adjacent) | G1 heap regions | Symptom: sawtooth heap graph, rising full-GC frequency, container killed near its memory limit. Basis of **lab 9** | addition | https://docs.oracle.com/en/java/javase/21/gctuning/garbage-first-g1-garbage-collector1.html |
 
 - [ ] **Step 4: Verify anchors for both**
 
