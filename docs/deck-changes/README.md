@@ -47,7 +47,7 @@ on zero hits, and `COUNT MISMATCH` naming both numbers otherwise.
 
 | Deck | Change doc | Status |
 |---|---|---|
-| 5.1 Intro to GC | `05-1-gc-intro.md` | applied 2026-09-24 |
+| 5.1 Intro to GC | `05-1-gc-intro.md` | applied 2026-09-23 |
 | 4.2 JIT compiler | `04-2-jit.md` | applied 2026-09-24 |
 | 7.1 Monitoring & profiling | `07-1-profiling-tools.md` | not started |
 | 5.2 Choosing a GC | `05-2-choosing-gc.md` | not started |
