@@ -1,145 +1,130 @@
-# Kubernetes objects needed — proposal
+# Kubernetes objects — simplified proposal
 
 **Status:** proposal, awaiting trainer review. Nothing built.
-**Reads from:** `docs/k8s-prep-work.md` (participant pre-call), `docs/local-k8s-setup-plan.md` (Tier 2 — bare k3s in WSL2).
+**Reuses:** `kubernetes-capstone-project/k8s-reference/v1-full` — a known-working manifest set.
+**Constraint:** the workshop is about **Java performance, not Kubernetes**. Every object has to earn
+its place by teaching something about the JVM; anything that only teaches Kubernetes is cut.
+**Target:** Windows 10/11 laptops, k3s inside a memory-capped WSL2.
 
 ---
 
-## 1. What they actually asked for
+## 1. The finding that shrinks the whole thing
 
-Three asks from the pre-call, in their words, and what each one needs from Kubernetes:
+**The humongous-object lab does not need a 2 GB heap.**
 
-| Their ask | What it really is | Needs |
+G1's region size is `heap / 2048`, clamped to a **1 MB minimum** and rounded to a power of two. So:
+
+| Heap | Computed | Actual region |
 |---|---|---|
-| *"pt k8s - cum configurăm"* | How to set pod resources | `requests` / `limits`, and the QoS class those produce |
-| *"cum testăm dacă avem resursele necesare"* | How to know whether the allocation is enough | live usage vs limit, `OOMKilled`, restart counts, behaviour under load |
-| *"aplicația SB consumă foarte multă memorie, de aceea sunt 64 de pod-uri"* | Why memory forces horizontal scale | the relationship between `-Xmx`, non-heap memory and the container limit |
+| 2 GB | 1 MB | **1 MB** |
+| 1 GB | 0.5 MB | **1 MB** (clamped) |
+| 512 MB | 0.25 MB | **1 MB** (clamped) |
 
-That third one is the most valuable and the least likely to be self-diagnosed. It is also where the
-money is: 64 pods driven by memory consumption is a recurring cloud bill.
+Any heap at or below 2 GB gives 1 MB regions, so the humongous threshold is 512 KB in every case.
+A 5–6 MB response is humongous at 1 GB exactly as it was at 2 GB in their Cloud Run incident.
 
-## 2. The teaching point the objects have to carry
+**The app container drops from 2 Gi to 1 Gi with no loss of teaching value** — and that is the
+largest line in the budget.
 
-**A JVM sized to its container limit gets OOMKilled even when the heap never fills.**
+## 2. Memory budget on a participant laptop
 
-The container limit covers the *whole process*: heap **plus** Metaspace, code cache, thread stacks,
-direct byte buffers, GC bookkeeping and the JVM itself. Setting `-Xmx2g` inside a 2 Gi limit leaves
-nothing for any of that, so the kernel kills the container while the heap still looks healthy in
-every JVM-level tool. This is very likely a contributor to their 64-pod situation, and it is
-invisible unless you look at the pod and the JVM *at the same time*.
+| Component | Request | Limit | Note |
+|---|---|---|---|
+| k3s control plane | — | ~700 Mi observed | API server, scheduler, controller, embedded etcd |
+| App under test | 1 Gi | **1 Gi** | requests == limits → **Guaranteed** QoS, which is itself a lesson |
+| Postgres | 128 Mi | 256 Mi | Trimmed from the capstone's 256/512 — the lab schema is tiny |
+| Load `Job` | 64 Mi | 128 Mi | Short-lived |
+| RabbitMQ *(optional)* | 128 Mi | 256 Mi | Only if the async lesson is wanted |
+| **Total** | | **~2.4 Gi** | Comfortable inside a 4 GB `.wslconfig` cap |
 
-Their reported incident was on **Cloud Run**, not Kubernetes — but the mechanism is identical, since
-both enforce a cgroup memory limit. The objects below teach it in a form they can inspect.
+Without the broker it is ~2.1 Gi. Both fit the 4 GB WSL2 cap from the setup plan, leaving headroom
+for Windows, an IDE and the JVM the participant is profiling **outside** the cluster.
 
-## 3. Proposed object set
+## 3. Message broker — Solace is not viable locally
 
-### Core — required
+| Broker | Minimum | Runtime | Verdict |
+|---|---|---|---|
+| **Solace PubSub+** | **1 CPU + 3.4 GiB** minimum; 2 CPU + 4 GB for a non-HA pod; also wants `--shm-size=1g` | — | **Out.** Larger than the entire rest of the budget combined |
+| **Kafka (KRaft)** | ~512 Mi–1 Gi | **JVM** | Avoid — see below |
+| **RabbitMQ** | ~128–256 Mi | Erlang | **Recommended fallback** |
 
-| Object | Why |
-|---|---|
-| `Namespace` | Isolates the lab; scopes the quota and limit-range below |
-| `ConfigMap` | Holds `JAVA_TOOL_OPTIONS`. **The main teaching lever** — change JVM flags and redeploy without rebuilding an image |
-| `Deployment` | Carries `resources.requests` / `resources.limits` and the probes. The object they will actually edit |
-| `Service` (ClusterIP) | Lets the load generator reach the app by name |
-| `Job` | Runs the load generator. Matches their own "send 10k transactions" scenario better than a long-lived pod |
+Two reasons for RabbitMQ over Kafka here, beyond size:
 
-### Supporting — recommended
+1. **Kafka is itself a JVM.** In a workshop whose entire subject is watching JVM memory, a second
+   JVM in the cluster competes for the memory being measured and muddies every `kubectl top` reading.
+   RabbitMQ runs on Erlang, so the JVM under test is the only JVM in the picture.
+2. RabbitMQ is roughly a quarter of Kafka's footprint.
 
-| Object | Why |
-|---|---|
-| `LimitRange` | Shows what a pod gets when it declares nothing. Directly answers "what happens if we forget?" |
-| `ResourceQuota` | Caps the namespace. Makes the 64-pods economics visible in miniature |
-| `HorizontalPodAutoscaler` | They scaled to 64 pods *because of memory*. Worth showing what memory-driven autoscaling does and does not fix |
+Solace matches their production stack, which is the argument for it — but at 3.4 GiB minimum it
+cannot coexist with k3s, Postgres and the app on a laptop. Recommend demonstrating the *pattern*
+with RabbitMQ and saying plainly that Solace is the same shape at a size that needs a server.
 
-### Already present in k3s
+## 4. What we reuse from the capstone, and what we cut
 
-`metrics-server` ships enabled in k3s, so `kubectl top pod` works with no extra install. **Verify on
-the day** — it can be disabled with `--disable=metrics-server`, and `kubectl top` failing at the
-front of the room is a bad look.
+The capstone's `v1-full` is proven and its resource values are sane. Reuse the shapes; cut anything
+that teaches Kubernetes rather than the JVM.
 
-### Deliberately excluded
+| Capstone | Here | Why |
+|---|---|---|
+| `skyhop-fe` Next.js frontend, Service, Ingress, config | **Cut entirely** | No UI is needed to measure a JVM |
+| `kind-cluster.yaml`, ingress setup | **Cut** | `kubectl port-forward` is one command and needs no cluster config |
+| Postgres as `StatefulSet` + `volumeClaimTemplates` (1 Gi PVC) | **Plain workload + `emptyDir`** | Lab data is disposable; a PVC adds a storage class, a bound volume and a cleanup step, and teaches nothing about the JVM |
+| `Secret` for DB credentials | **Folded into the ConfigMap** | Local lab, throwaway password. One object fewer |
+| `replicas: 2` on the backend | **`replicas: 1`** | Two replicas halve the memory available per pod and add "which pod am I looking at?" confusion |
+| `startupProbe` + readiness + liveness | **Keep** | Proven; the startup probe specifically prevents a restart while Postgres initialises |
+| Postgres `readinessProbe` with `pg_isready` | **Keep** | Proven and cheap |
 
-`Ingress` (port-forward is enough), `PodDisruptionBudget`, `NetworkPolicy`, `StatefulSet`,
-`PersistentVolumeClaim`, Helm. None of them teach anything about memory, and each is a prerequisite
-and a failure mode we would be adding for nothing.
+Net: **11 manifest files → 5**, and one of those is optional.
 
-## 4. The progression — four states of one Deployment
-
-This is the spine. One `Deployment`, one `ConfigMap`, four edits, each producing a visibly different
-failure or success. Every step reproduces something they have actually hit.
-
-| # | `limits.memory` | JVM flags | What happens | Lesson |
-|---|---|---|---|---|
-| 1 | *(none)* | default | Runs; consumes what it likes | No limit means no protection — and no QoS guarantee |
-| 2 | `2Gi` | `-Xmx2g` | **OOMKilled**, exit 137, restart loop | The limit covers the *whole process*, not just the heap |
-| 3 | `2Gi` | `-XX:MaxRAMPercentage=75` | Survives startup, then full GCs and a sawtooth heap under load | Humongous allocations — the 1 MB default region at this heap |
-| 4 | `2Gi` | `+ -XX:G1HeapRegionSize=16m` | Stable | The fix, and why it was invisible without the GC log |
-
-Step 2 → 3 answers *"how do I size it?"*. Step 3 → 4 is their Cloud Run incident, reproduced.
-
-Observation commands at each step:
-
-```bash
-kubectl top pod -n perf-lab
-kubectl describe pod <name> -n perf-lab | grep -A5 'Last State'   # OOMKilled, exit 137
-kubectl get pod <name> -n perf-lab -o jsonpath='{.status.qosClass}'
-kubectl logs <name> -n perf-lab | grep -i humongous
-```
-
-## 5. Sketch
-
-`k8s/` in the training repo:
+## 5. The object set
 
 ```
 k8s/
-  00-namespace.yaml
-  10-configmap-jvm.yaml        # the file participants edit
-  20-deployment.yaml           # requests/limits live here
-  30-service.yaml
-  40-job-load.yaml
-  50-limitrange.yaml           # optional
-  51-resourcequota.yaml        # optional
-  52-hpa.yaml                  # optional
-  README.md                    # the four steps above, as commands
+  00-namespace.yaml      Namespace
+  10-postgres.yaml       workload + Service + env (emptyDir, no PVC, no Secret)
+  20-jvm-config.yaml     ConfigMap  <- the only file participants edit
+  30-app.yaml            workload + Service (requests == limits == 1Gi)
+  40-load-job.yaml       Job
+  50-rabbitmq.yaml       optional, only if the async lesson is in scope
 ```
 
+`20-jvm-config.yaml` is the whole point — participants change one value and re-apply:
+
 ```yaml
-# 10-configmap-jvm.yaml — step 2 of the progression
 apiVersion: v1
 kind: ConfigMap
 metadata: { name: jvm-opts, namespace: perf-lab }
 data:
-  JAVA_TOOL_OPTIONS: "-Xmx2g -Xlog:gc+heap=debug:file=/tmp/gc.log:tags,uptime"
+  JAVA_TOOL_OPTIONS: >-
+    -XX:MaxRAMPercentage=75
+    -Xlog:gc+heap=debug:file=/tmp/gc.log:tags,uptime
 ```
 
-```yaml
-# 20-deployment.yaml — excerpt
-spec:
-  containers:
-    - name: app
-      envFrom: [{ configMapRef: { name: jvm-opts } }]
-      resources:
-        requests: { memory: "2Gi", cpu: "500m" }
-        limits:   { memory: "2Gi", cpu: "1" }      # requests == limits -> Guaranteed QoS
-      readinessProbe:
-        httpGet: { path: /actuator/health/readiness, port: 8080 }
+## 6. The progression, unchanged in substance
+
+One workload, one ConfigMap, three edits — reproducing their Cloud Run incident at 1 Gi:
+
+| # | `limits.memory` | JVM flags | Result | Lesson |
+|---|---|---|---|---|
+| 1 | `1Gi` | `-Xmx1g` | **OOMKilled**, exit 137 | The limit covers the whole process, not just the heap |
+| 2 | `1Gi` | `-XX:MaxRAMPercentage=75` | Survives start; sawtooth and full GCs under load | Humongous allocations at a 1 MB region size |
+| 3 | `1Gi` | `+ -XX:G1HeapRegionSize=16m` | Stable | The fix, invisible without the GC log |
+
+The capstone's "no limits at all" step is dropped — it costs a cycle and teaches least.
+
+```bash
+kubectl top pod -n perf-lab
+kubectl describe pod <name> -n perf-lab | grep -A5 'Last State'
+kubectl get pod <name> -n perf-lab -o jsonpath='{.status.qosClass}'
+kubectl logs <name> -n perf-lab --previous | grep -i humongous
 ```
 
-Requests equal to limits gives **Guaranteed** QoS, which is worth showing explicitly — it changes
-which pods the kubelet evicts first under node pressure, and it is a lever they can pull on a
-memory-constrained cluster.
-
-The app already exposes Actuator, so the probes need no new code.
-
-## 6. What this does not cover
-
-- **Solace / async load.** The `Job` drives HTTP. Their real system is queue-driven with no UI. Reproducing that needs a broker (Tier 3, proposed out of scope).
-- **Cloud Run specifically.** Not Kubernetes. The mechanism transfers; the objects do not.
-- **Multi-node behaviour.** Single-node k3s cannot show real scheduling pressure or node eviction. `ResourceQuota` and the HPA demonstrate the shapes, not the reality.
+`--previous` reads the log of the killed container, which removes the need for a PVC to survive an
+OOMKill — that is why `emptyDir` is sufficient in §4.
 
 ## 7. Open questions
 
-- Does the Kubernetes material become part of **lab 9**, or a separate trainer-run demo? §2 of the setup plan showed lab 9 itself needs no container, so this is genuinely optional — and the schedule is already at 6–7 hours of labs inside 17.
-- Include the optional three (`LimitRange`, `ResourceQuota`, `HPA`), or keep to the five core objects? The HPA is the most directly relevant to their 64 pods; the other two are cheap but add reading.
-- Should the progression run **all four steps**, or start at step 2? Step 1 teaches little and costs a redeploy.
-- Do we want the GC log written to a `PersistentVolume` so it survives an OOMKill, or is `kubectl logs --previous` enough? The latter is simpler and avoids a PVC.
+- Is the async/broker lesson in scope at all? If not, drop `50-rabbitmq.yaml` and the budget falls to ~2.1 Gi. Given the workshop is about Java performance and the schedule already carries 6–7 hours of labs, dropping it is defensible.
+- SQL Server was mentioned as unlikely. Confirm Postgres only — SQL Server's container wants ~2 GB on its own and would blow the budget as thoroughly as Solace.
+- Do participants build the app image locally, or do we publish one as the capstone does with `bogdansolga/skyhop-be`? Publishing avoids a slow first build; building avoids a registry dependency.
+- Does this run as part of lab 9, or as a trainer-only demo? Lab 9 itself still needs no cluster.
