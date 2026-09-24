@@ -98,6 +98,38 @@
 #   - append-style rows: pass <=> R == E AND A == R.
 #   - plain-style rows:  pass <=> R == E AND A == 0.
 #   - delete-style rows: pass <=> A == 0 (there is no R to check).
+#
+# --- Deck-wide cross-check on scoped rows (safety-critical) -----------
+# A scoped row's IN-SCOPE counts (R, A above) are NOT sufficient on their
+# own: they say nothing about whether the anchor ALSO occurs outside the
+# declared scope. Before commit 85cd5f1 the Slide column was documentation
+# only and every count was deck-wide, so an accidental duplicate anywhere
+# was always caught. Populating Slide now narrows counting with no
+# corroborating check -- and the repo's own change docs populate Slide on
+# nearly every row as documentation, so an anchor that also exists outside
+# the declared scope is silently missed by every gate (deck-check.sh,
+# --dry-run, and the real apply) at once. So for EVERY scoped row this
+# script additionally computes A_deckwide (the anchor's true occurrence
+# count across the WHOLE deck, unsliced) and compares it to A_scoped (the
+# in-scope count already computed above). A mismatch means the anchor
+# exists outside the declared scope and the row is UNSAFE, aborting the
+# whole run, UNLESS the Category column carries the explicit token
+# `outside-scope-ok` -- for the legitimate case where narrowing is
+# intentional (e.g. the same string occurs correctly elsewhere and must
+# NOT be touched). Even then the count of out-of-scope occurrences is
+# printed, never silent.
+#
+# --- Slide-boundary hardening (safety-critical) ------------------------
+# slide_slice trusts any line matching "=== Slide N [id] ===" as a section
+# boundary, with no guard against slide CONTENT that happens to look like
+# one -- which would mis-slice a scoped row's in-scope text and silently
+# mis-count R/A. Before trusting any scoped count, verify_slide_boundaries
+# checks that the boundaries parsed out of the deck-text dump agree, in
+# count, order and objectId, with the presentation's real slides (from
+# `gslides.sh personal slides <id>`). Any disagreement hard-fails the
+# whole run before Pass 1 even starts -- scoped counts are not trustworthy
+# otherwise, and a silent undercount could make a `<DELETE>` row read as
+# "already applied" and skip a needed deletion.
 set -uo pipefail
 
 DOC="${1:?usage: deck-apply.sh <change-doc.md> <presentation-id> [--dry-run]}"
@@ -113,6 +145,16 @@ DELETE_TOKEN='<DELETE>'
 # without `set -e`, and only the captured stdout (empty on no match) is used.
 count_occurrences() {
     grep -o -F -- "$1" "$2" | wc -l | tr -d '[:space:]'
+}
+
+# Whether the Category column carries the explicit `outside-scope-ok` token
+# -- the escape hatch for a scoped row whose anchor legitimately also
+# occurs outside the declared scope and must be left untouched there (e.g.
+# MANUAL-ACTIONS.md item 8: "Java Flight Recorder" is correct on slide 18
+# AND correct, unrelated, on slide 42). Isolated-token match, same style as
+# expected_count's xN token, so it can't fire on a substring of other text.
+has_outside_scope_ok() {
+    printf '%s' "$1" | grep -qE '(^|[[:space:],])outside-scope-ok([[:space:],]|$)'
 }
 
 # Expected occurrence count from the Category column's `xN` token, default 1.
@@ -198,6 +240,50 @@ resolve_page_object_ids() {
     printf '%s\n' "${ids[@]}" | jq -R . | jq -s -c .
 }
 
+# Hard safety gate for scoped counting: verify that the "=== Slide N [id]
+# ===" boundary lines parsed out of the deck-text dump agree -- in count,
+# in order, and in objectId -- with the presentation's real slides (one
+# objectId per line, in slide order, from `gslides.sh personal slides`).
+# slide_slice trusts any line that merely matches the boundary regex; if
+# slide CONTENT itself contains a line shaped like "=== Slide N [...] ===",
+# slide_slice would mis-slice and every scoped R/A count downstream would
+# be silently wrong. This can fail open (undercounting A on a <DELETE> row
+# reads as "already applied" and skips a needed deletion) as easily as
+# closed, so any disagreement aborts the whole run before Pass 1 starts --
+# scoped counts are simply not trustworthy otherwise.
+verify_slide_boundaries() {
+    local deck_file="$1" slide_ids_file="$2"
+    local real_total parsed_total boundaries
+    real_total="$(wc -l < "$slide_ids_file" | tr -d '[:space:]')"
+    boundaries="$(mktemp)"
+    grep -E '^=== Slide [0-9]+ \[[^]]*\] ===' "$deck_file" > "$boundaries"
+    parsed_total="$(wc -l < "$boundaries" | tr -d '[:space:]')"
+    if [ "$parsed_total" -ne "$real_total" ]; then
+        echo "Error: slide boundary count mismatch -- parsed $parsed_total \"=== Slide N [...] ===\" marker(s) out of the deck-text dump, but $GSLIDES personal slides reports $real_total real slide(s). Refusing to trust any scoped count. This can happen if a slide's own text content contains a line shaped like a slide-boundary header." >&2
+        rm -f "$boundaries"
+        return 1
+    fi
+    local expect_idx=0 bline idx objid real_id
+    while IFS= read -r bline; do
+        idx="$(printf '%s' "$bline" | awk '{print $3}')"
+        objid="$(printf '%s' "$bline" | sed -E 's/^=== Slide [0-9]+ \[([^]]*)\] ===.*/\1/')"
+        if [ "$idx" != "$expect_idx" ]; then
+            echo "Error: slide boundaries out of sequence -- expected index $expect_idx next, found $idx. Refusing to trust any scoped count." >&2
+            rm -f "$boundaries"
+            return 1
+        fi
+        real_id="$(sed -n "$((expect_idx + 1))p" "$slide_ids_file")"
+        if [ "$objid" != "$real_id" ]; then
+            echo "Error: slide boundary objectId mismatch at index $expect_idx -- parsed \"$objid\" from the deck-text dump, but the live presentation's slide $expect_idx has objectId \"$real_id\". Refusing to trust any scoped count." >&2
+            rm -f "$boundaries"
+            return 1
+        fi
+        expect_idx=$((expect_idx + 1))
+    done < "$boundaries"
+    rm -f "$boundaries"
+    return 0
+}
+
 # Read the deck once, up front, for the already-applied check (one network
 # call for a ~1000-line deck, not one per row). Re-read after applying (below)
 # for post-verify. A failed read must abort loudly — never be mistaken for
@@ -220,12 +306,16 @@ done < "$DOC"
 if [ "$needs_scope" -eq 1 ]; then
     "$GSLIDES" personal slides "$PID" > "$SLIDE_IDS_FILE" 2>/dev/null \
         || { echo "Error: could not list slide object IDs for $PID" >&2; exit 1; }
+    verify_slide_boundaries "$DECK_TEXT" "$SLIDE_IDS_FILE" \
+        || exit 1
 fi
 
 # ---------------------------------------------------------------------
 # Shared row classifier. Reads: $line. Sets: anchor, repl (display value —
 # "<DELETE>" is shown as itself, never as an empty string), is_delete,
-# scope, scope_err, style, expected, acount, rcount, already, safe.
+# scope, scope_err, style, expected, acount, rcount, already, safe,
+# scope_mismatch, outside_count, outside_ok, a_deckwide (deck-wide
+# cross-check, Fix 1 — see header comment).
 # `apply_repl` holds the value actually sent to the API (empty string for
 # delete rows). Pure function of $line and $deck_file — side-effect free,
 # safe to call from the pre-flight pass, the apply pass and post-verify.
@@ -256,6 +346,22 @@ classify_row() {
 
     expected="$(expected_count "$cat")"
     acount="$(count_occurrences_scoped "$anchor" "$scope" "$deck_file")"
+
+    # Deck-wide cross-check (Fix 1): a scoped row's in-scope count alone
+    # cannot tell us whether the anchor ALSO occurs outside the declared
+    # scope -- narrowing with no corroborating check is exactly the bug
+    # this fixes. Only meaningful when scoped and the scope itself resolved.
+    scope_mismatch=0
+    outside_count=0
+    outside_ok=0
+    if [ -n "$scope" ] && [ -z "$scope_err" ]; then
+        has_outside_scope_ok "$cat" && outside_ok=1
+        a_deckwide="$(count_occurrences "$anchor" "$deck_file")"
+        if [ "$a_deckwide" -ne "$acount" ]; then
+            scope_mismatch=1
+            outside_count=$((a_deckwide - acount))
+        fi
+    fi
 
     style="plain"
     already=0
@@ -311,6 +417,17 @@ while IFS= read -r line; do
         echo "        fix: correct the Slide column to a valid 0-based index (or comma-separated list), or clear it for whole-deck behaviour."
         had_unsafe=1
         continue
+    fi
+
+    if [ "$scope_mismatch" -eq 1 ] && [ "$outside_ok" -ne 1 ]; then
+        echo "UNSAFE  $anchor  (scoped to slide(s) $scope: found $acount within scope but $a_deckwide deck-wide -- occurs $outside_count time(s) OUTSIDE the declared scope)"
+        echo "        fix: add 'outside-scope-ok' to Category if the occurrence(s) outside scope are correct and must be left untouched, otherwise widen/correct the Slide column or the anchor."
+        had_unsafe=1
+        continue
+    fi
+
+    if [ "$scope_mismatch" -eq 1 ] && [ "$outside_ok" -eq 1 ]; then
+        echo "note    $anchor  outside-scope-ok: $outside_count occurrence(s) outside slide(s) $scope left untouched"
     fi
 
     if [ "$already" -eq 1 ] || [ "$safe" -eq 1 ]; then
