@@ -102,6 +102,41 @@ than half-building it.
 `scripts/preflight.sh` / `.ps1` gain a Docker check. Every failure needs an entry in
 `docs/PREFLIGHT-TROUBLESHOOTING.md` — that rule already holds and applies here.
 
+## 4b. Which distribution is actually lightest — research, 2026-09-24
+
+The premise "kind requires Docker, the others may not" is **true on Linux and inverts everywhere
+else**, which decides this for a mixed-platform classroom.
+
+| | What it is | Needs Docker | Runs natively on macOS | Reported idle RAM |
+|---|---|---|---|---|
+| **k3d** | k3s running *inside* Docker | Yes | Yes, via Docker | **~500 MB** |
+| **k3s** | Lightweight distro, single binary | No, on Linux | **No** | ~512 MB advertised |
+| **k0s** | Lightweight distro, single binary | No, on Linux | **No** | ~510 MB advertised, ~600 MB measured idle |
+| **kind** | Upstream Kubernetes in Docker | Yes | Yes, via Docker | **~800 MB** |
+
+Two findings:
+
+**1. k3d is the lightest of the four by measured idle memory** — roughly 500 MB, against ~600 MB for
+k0s and ~800 MB for kind. It inherits k3s's footprint and adds only the Docker layer.
+
+**2. The "no Docker needed" advantage of k3s and k0s exists only on Linux.** Neither runs natively on
+macOS: k3s relies on Linux-specific syscalls and will not execute on Darwin, so it needs Lima,
+Colima or multipass — a full Linux VM, which is *heavier* than Docker, not lighter. k0s documents
+Linux and Windows Server support with **no macOS support at all**, and its Windows support is for
+Server worker nodes joining a Linux-controlled cluster, not a standalone laptop cluster. It also
+requires cgroup v2 and rejects cgroup v1.
+
+So for anyone not on Linux, choosing k3s or k0s means installing a VM *on top of* the Docker they
+already need for Tier 0 — strictly more setup for strictly more memory.
+
+**Conclusion: k3d.** It is simultaneously the lightest measured and the most portable, and it adds
+no new dependency because Tier 0 already requires Docker. kind costs ~300 MB more for no benefit
+here; its advantage is fidelity to upstream Kubernetes, which matters for conformance testing and
+not for demonstrating a memory limit.
+
+*Caveat: these are reported figures from published comparisons, not measured on this hardware. The
+ordering is consistent across sources; treat the absolute numbers as indicative.*
+
 ## 5. Recommendation
 
 Build **Tier 0 only** as required lab infrastructure. Build **Tier 1 as a trainer-run demo** with a
@@ -116,7 +151,7 @@ can hand them.
 ## 6. Open questions
 
 - Approve the tiering, or do you want a cluster on every laptop?
-- k3d or kind for Tier 1? I lean k3d for speed; kind is closer to what they run in GCP.
+- ~~k3d or kind for Tier 1?~~ **Settled by §4b: k3d.** Lightest of the four and needs no dependency beyond the Docker that Tier 0 already requires. k3s and k0s are Linux-only in practice.
 - Does lab 9 run **only** in a container, or also bare-metal first so participants see the same code behave differently once a limit exists? The contrast is a strong teaching beat but costs time.
 - Is a prebuilt image published, or do participants build locally? Building avoids a registry but costs minutes on day one.
 - Case B (Solace) — confirm scoping it out, or keep it as a stretch topic?
