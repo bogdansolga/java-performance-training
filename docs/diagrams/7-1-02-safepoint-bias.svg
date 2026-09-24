@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+
+  <!-- background -->
+  <rect width="1280" height="720" fill="#ffffff"/>
+
+  <!-- title strip -->
+  <text x="40" y="40" font-size="22" font-weight="700" fill="#1a1a1a">Safepoint bias: why a hot method can be invisible</text>
+  <text x="40" y="64" font-size="13" fill="#5e6680">A sampler can only read a thread when that thread has reached a safepoint.</text>
+
+  <!-- outer container -->
+  <rect x="40" y="88" width="1200" height="560" rx="16" fill="#cfe2f3" stroke="#1a1a1a" stroke-width="1"/>
+
+  <!-- ===== Thread timeline ===== -->
+  <rect x="90" y="130" width="1100" height="200" rx="14" fill="#ffffff" stroke="#1a1a1a" stroke-width="1"/>
+  <text x="120" y="166" font-size="16" font-weight="700" fill="#1a1a1a">Thread timeline - where the thread really is</text>
+
+  <rect x="120" y="190" width="200" height="44" rx="6" fill="#d5f5e3" stroke="#1a1a1a" stroke-width="1"/>
+  <text x="220" y="217" font-size="13" fill="#0e6655" text-anchor="middle">methodA()</text>
+  <rect x="320" y="190" width="300" height="44" rx="6" fill="#fdebd0" stroke="#1a1a1a" stroke-width="1"/>
+  <text x="470" y="217" font-size="13" fill="#7e5109" text-anchor="middle">get() - no safepoint inside</text>
+  <rect x="620" y="190" width="180" height="44" rx="6" fill="#d5f5e3" stroke="#1a1a1a" stroke-width="1"/>
+  <text x="710" y="217" font-size="13" fill="#0e6655" text-anchor="middle">methodA()</text>
+  <rect x="800" y="190" width="330" height="44" rx="6" fill="#fdebd0" stroke="#1a1a1a" stroke-width="1"/>
+  <text x="965" y="217" font-size="13" fill="#7e5109" text-anchor="middle">get() - no safepoint inside</text>
+
+  <text x="120" y="268" font-size="13" fill="#5e6680">Sampler ticks (only land where a safepoint exists):</text>
+  <text x="240" y="300" font-size="20" fill="#1a1a1a" text-anchor="middle">&#9660;</text>
+  <text x="660" y="300" font-size="20" fill="#1a1a1a" text-anchor="middle">&#9660;</text>
+  <text x="770" y="300" font-size="20" fill="#1a1a1a" text-anchor="middle">&#9660;</text>
+
+  <!-- ===== What each profiler reports ===== -->
+  <rect x="90" y="360" width="530" height="240" rx="14" fill="#ffffff" stroke="#1a1a1a" stroke-width="1"/>
+  <rect x="90" y="360" width="530" height="54" rx="14" fill="#d5f5e3"/>
+  <rect x="90" y="400" width="530" height="14" fill="#d5f5e3"/>
+  <text x="355" y="393" font-size="18" font-weight="700" fill="#0e6655" text-anchor="middle">What the sampler reports</text>
+  <text x="130" y="452" font-size="15" font-weight="700" fill="#1a1a1a">methodA() - 100%</text>
+  <text x="130" y="476" font-size="13" fill="#5e6680">Every tick landed inside methodA.</text>
+  <text x="130" y="516" font-size="15" font-weight="700" fill="#1a1a1a">get() - 0%</text>
+  <text x="130" y="540" font-size="13" fill="#5e6680">Never sampled, so it does not appear at all.</text>
+  <text x="130" y="576" font-size="13" fill="#7e5109" font-style="italic">The sampler is not wrong - it was never allowed to look.</text>
+
+  <rect x="660" y="360" width="530" height="240" rx="14" fill="#ffffff" stroke="#1a1a1a" stroke-width="1"/>
+  <rect x="660" y="360" width="530" height="54" rx="14" fill="#e8daef"/>
+  <rect x="660" y="400" width="530" height="14" fill="#e8daef"/>
+  <text x="925" y="393" font-size="18" font-weight="700" fill="#4a235a" text-anchor="middle">What instrumenting reports</text>
+  <text x="700" y="452" font-size="15" font-weight="700" fill="#1a1a1a">get() - 12% of total time</text>
+  <text x="700" y="476" font-size="13" fill="#5e6680">Called 4.7 million times.</text>
+  <text x="700" y="516" font-size="15" font-weight="700" fill="#1a1a1a">methodA() - the remainder</text>
+  <text x="700" y="540" font-size="13" fill="#5e6680">Fewer calls, more time in each.</text>
+  <text x="700" y="576" font-size="13" fill="#4a235a" font-style="italic">The fix is call count, not a faster get().</text>
+
+  <!-- footer -->
+  <text x="640" y="680" font-size="13" fill="#1a1a1a" text-anchor="middle">async-profiler avoids this by sampling without waiting for a safepoint.</text>
+
+</svg>
