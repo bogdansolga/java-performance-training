@@ -34,8 +34,9 @@ largest line in the budget.
 | App under test | 1 Gi | **1 Gi** | requests == limits → **Guaranteed** QoS, which is itself a lesson |
 | Postgres | 128 Mi | 256 Mi | Trimmed from the capstone's 256/512 — the lab schema is tiny |
 | Load `Job` | 64 Mi | 128 Mi | Short-lived |
-| RabbitMQ *(optional)* | 128 Mi | 256 Mi | Only if the async lesson is wanted |
-| **Total** | | **~2.4 Gi** | Comfortable inside a 4 GB `.wslconfig` cap |
+| **Default total** | | **~2.1 Gi** | Comfortable inside a 4 GB `.wslconfig` cap |
+| RabbitMQ *(not applied by default)* | 128 Mi | 256 Mi | Ships for a full setup on request |
+| **With broker** | | **~2.4 Gi** | Still inside the cap |
 
 The default set is **~2.1 Gi** — the broker is shipped but not applied. With it, ~2.4 Gi. Both fit
 the 4 GB WSL2 cap from the setup plan, leaving headroom for Windows, an IDE and the JVM the
@@ -83,7 +84,7 @@ that teaches Kubernetes rather than the JVM.
 | `startupProbe` + readiness + liveness | **Keep** | Proven; the startup probe specifically prevents a restart while Postgres initialises |
 | Postgres `readinessProbe` with `pg_isready` | **Keep** | Proven and cheap |
 
-Net: **11 manifest files → 5**, and one of those is optional.
+Net: **11 manifest files → 5 applied**, plus the broker manifest that ships unapplied.
 
 ## 5. The object set
 
