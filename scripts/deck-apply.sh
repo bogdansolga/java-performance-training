@@ -21,10 +21,11 @@
 # `manual`.
 #
 # `gslides.sh personal replace` has no pageObjectIds parameter, so a scoped
-# row is sent via `gslides.sh personal batch` with a raw replaceAllText
-# request carrying `pageObjectIds`. An unscoped row (blank/"-"/"—" Slide
-# column) uses `gslides.sh personal replace` exactly as before — the legacy
-# path is untouched.
+# row is sent via `gslides.sh personal replace-on-slide <id> <scope> <old>
+# <new>`, which resolves the scope's indices to live page objectIds itself
+# and issues the scoped replaceAllText request. An unscoped row (blank/"-"/
+# "—" Slide column) uses `gslides.sh personal replace` exactly as before —
+# the legacy path is untouched.
 #
 # Occurrence counting (R, A below) for a scoped row is computed against
 # ONLY that row's slide(s) — sliced locally out of the single up-front deck
@@ -506,12 +507,8 @@ while IFS= read -r line; do
     fi
 
     if [ -n "$scope" ]; then
-        page_ids_json="$(resolve_page_object_ids "$scope" "$SLIDE_IDS_FILE")" \
-            || { echo "Error: could not resolve Slide scope \"$slide_raw\" for anchor: $anchor" >&2; exit 1; }
-        request="$(jq -n --arg a "$anchor" --arg r "$apply_repl" --argjson pids "$page_ids_json" \
-            '[{replaceAllText:{containsText:{text:$a, matchCase:true}, replaceText:$r, pageObjectIds:$pids}}]')"
-        "$GSLIDES" personal batch "$PID" "$request" >/dev/null \
-            || { echo "Error: gslides batch replace failed for anchor: $anchor" >&2; exit 1; }
+        "$GSLIDES" personal replace-on-slide "$PID" "$scope" "$anchor" "$apply_repl" >/dev/null \
+            || { echo "Error: gslides replace-on-slide failed for anchor: $anchor" >&2; exit 1; }
     else
         "$GSLIDES" personal replace "$PID" "$anchor" "$apply_repl" >/dev/null \
             || { echo "Error: gslides replace failed for anchor: $anchor" >&2; exit 1; }
