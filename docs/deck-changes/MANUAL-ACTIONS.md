@@ -5,13 +5,24 @@ text — it cannot create slides, insert images, split or merge text runs, or ap
 
 Everything here is outstanding unless marked done.
 
+> **STATUS 2026-09-26 — 7 of 14 items are DONE**, applied by script and verified against fresh deck dumps.
+> They became scriptable once the harness gained slide scoping. Items struck through below need
+> nothing further. The remaining 7 (2, 3, 4, 5, 12, 13, 14) are genuinely manual: a same-slide
+> duplicate that page-level scoping cannot split, a new slide, a badge, image placement, screenshot
+> deletion and a merge pass.
+>
+> **Two cosmetic residues to tidy while you are in the editor:** deleting text does not delete its
+> bullet, so deck 7.1 slide 1 has an empty bullet where `jhat` was, and slide 38 has a blank line.
+> No automated check can see these.
+
+
 ---
 
 ## Deck 5.1 — An introduction to Garbage Collection
 
 Presentation: https://docs.google.com/presentation/d/1Y2xjPThug1WM2haytVv8M64tQDAIkI8TFl5CO4FU2lc/edit
 
-**1. Slide 22 — G1 default release is wrong**
+**1. ~~DONE 2026-09-26~~ — Slide 22 — G1 default release is wrong**
 
 Currently reads `Enabled by default since` / `JDK 11` across two separate text runs.
 Change to a single line: **"Enabled by default since JDK 9"**.
@@ -23,11 +34,9 @@ Source: https://openjdk.org/jeps/248
 
 **2. Slide 38 — ZGC summary line**
 
-The ZGC bullet reads `Mainstream since Java 11`. Change **that line only** to
-**"Production-ready since JDK 15"**.
+The ZGC bullet reads `Mainstream since Java 11`. Change **that line only** to **"Production-ready since JDK 15"**.
 
-Cannot be scripted: the identical string appears immediately below under the **Epsilon** bullet,
-where it is **correct** and must not be touched.
+Cannot be scripted: the identical string appears immediately below under the **Epsilon** bullet, where it is **correct** and must not be touched.
 Source: https://openjdk.org/jeps/377
 
 **3. Slide 39 — collectors overview badge**
@@ -96,14 +105,14 @@ Presentation: https://docs.google.com/presentation/d/1952R9NhvuYNuG9TujMfEPpy_w6
 
 The 6 scripted rows were applied on 2026-09-24 and verified. These are what the tool cannot do.
 
-**6. Slide 1 — delete the `jhat` entry**
+**6. ~~DONE 2026-09-26~~ — Slide 1 — delete the `jhat` entry**
 
 Remove both runs: the tool name `jhat` and its description `- reads and helps analyse memory heap
 dumps`. `jhat` was removed in JDK 9.
 Not scriptable: the name and description are two separate text runs.
 Source: https://openjdk.org/jeps/241
 
-**7. Slide 16 — replace the `jhat` mention**
+**7. ~~DONE 2026-09-26~~ — Slide 16 — replace the `jhat` mention**
 
 Change "JDK tools - including visualvm & jhat" to "JDK tools - including visualvm; for heap dumps
 use `jcmd <pid> GC.heap_dump`, then open in JMC or Eclipse MAT".
@@ -111,7 +120,7 @@ Not scriptable: the bare `jhat` run here is **byte-identical to slide 1's**, but
 different fixes — a whole-deck replace would give them the same text.
 Source: https://openjdk.org/jeps/241
 
-**8. Slide 18 — move Java Flight Recorder from the Paid list to the Free list**
+**8. ~~DONE 2026-09-26~~ — Slide 18 — move Java Flight Recorder from the Paid list to the Free list**
 
 Place it alongside JMC, VisualVM and async-profiler. JFR has been free and open-source since
 JDK 11 (JEP 328); it was a commercial feature only under Oracle JDK 8, which is likely why the
@@ -120,13 +129,13 @@ Not scriptable: the string `Java Flight Recorder` also appears **correctly** in 
 caption, which a whole-deck replace would corrupt.
 Source: https://openjdk.org/jeps/328
 
-**9. Slide 18 — delete the stale parenthetical after `JProbe`**
+**9. ~~DONE 2026-09-26~~ — Slide 18 — delete the stale parenthetical after `JProbe`**
 
 Remove "(deprecated by the developing company?)". The JProbe line now states the status outright,
 so the hedge is redundant.
 Not scriptable: three text runs, and a genuine deletion.
 
-**10. Slide 37 — rewrite the native-profiler line**
+**10. ~~DONE 2026-09-26~~ — Slide 37 — rewrite the native-profiler line**
 
 Change "→ GlassFish startup in Oracle Developer Studio → native profiler" to
 "→ native profiling of a Java process, using async-profiler or perf →". Oracle Developer Studio is
@@ -135,7 +144,7 @@ this deck describes on slide 31.
 Not scriptable: three text runs.
 Source: https://github.com/async-profiler/async-profiler
 
-**11. Slide 38 — rewrite the native-profile caption**
+**11. ~~DONE 2026-09-26~~ — Slide 38 — rewrite the native-profile caption**
 
 Change "The GlassFish startup profile, showed in Oracle Developer Studio profiling tool" to
 "A native CPU profile, captured with async-profiler / perf", and delete the now-redundant

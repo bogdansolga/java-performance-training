@@ -91,4 +91,6 @@ scope — visible, never silent.
 | 3 + 3.1 Toolbox & profiling | `03-toolbox-profiling.md` | not started |
 | 3.2–3.4 CPU/Disk/Network | `03-2-4-cpu-disk-network.md` | not started |
 | 1 + Overview | `01-overview.md` | not started |
+| 5.1 pass 2 (items 1) | `05-1-gc-intro-pass2.md` | applied 2026-09-26 |
+| 7.1 pass 2 (items 6-11) | `07-1-profiling-tools-pass2.md` | applied 2026-09-26 |
 | Lab & prerequisite slides | `99-lab-slides.md` | not started |
