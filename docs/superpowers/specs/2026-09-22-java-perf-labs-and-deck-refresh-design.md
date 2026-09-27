@@ -134,7 +134,7 @@ Every `correction` and `addition` row carries a source URL (JEP, release notes, 
 | Generational ZGC — opt-in 21, default mode 23, non-gen removed 24 | 439 / 474 / 490 | 5.1, 5.2 |
 | Compact object headers — product in 25, ~22% heap reduction | 519 | 5.3, 6.1 |
 | AOT class loading and linking, method profiling, CLI ergonomics | 483 / 515 / 514 | 4.2 |
-| Generational Shenandoah | 521 | 5.1 |
+| Generational Shenandoah — experimental in 24, product in 25, **not** the default | 404 / 521 | 5.1 |
 | **Virtual threads** | 444 (final in 21) | threading stretch topic, 3.2, lab 3 |
 
 Virtual threads appear nowhere in the current deck set. For a course baselined on 21 that spends a session on thread pools, this is a larger gap than any single version error.
