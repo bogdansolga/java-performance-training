@@ -854,7 +854,7 @@ Write `docs/deck-changes/04-1-improvements.md`. Go through `/tmp/deck-4-1.txt` a
 |---|---|---|
 | Any JDK version claim | Check against 11 / 17 / 21 / 25; badge if the difference is major | the relevant JEP |
 | Thread pool or concurrency advice | Add the virtual-threads qualifier — a blocking task no longer needs a platform thread on 21+ | https://openjdk.org/jeps/444 |
-| Sizing advice keyed to host CPUs or RAM | Add the container qualifier — the JVM reads the cgroup quota | https://openjdk.org/jeps/343 |
+| Sizing advice keyed to host CPUs or RAM | Add the container qualifier — the JVM reads the cgroup quota | https://bugs.openjdk.org/browse/JDK-8196595 |
 | Caching or data-access advice | Connect to lab 2, which is the N+1 defect | n/a |
 | Named tools, products or URLs | Verify each still exists; replace dead links | the live URL |
 | Streams API performance claims | Deck 1 slide 2 flags Streams as a case where a language feature can cost performance — keep the two decks consistent | n/a |
@@ -998,7 +998,7 @@ One file each: `02-1.md`, `02-2.md`, `02-3.md`, `02-4.md`. `deck-check.sh` reads
 | Slide | Anchor | Current context | Proposed text | Category | Source |
 |---|---|---|---|---|---|
 | 2 | A typical development cycle entails feature-freeze date | conflicting forces | In continuous delivery there is no feature freeze - regressions must be caught per merge request | correction | n/a |
-| 10 | test ran on 2 or 4-cores machine behaves very differently | run on target system | Container CPU limits change this again - the JVM sees the cgroup quota, not the host | addition | https://openjdk.org/jeps/343 |
+| 10 | test ran on 2 or 4-cores machine behaves very differently | run on target system | Container CPU limits change this again - the JVM sees the cgroup quota, not the host | addition | https://bugs.openjdk.org/browse/JDK-8196595 |
 
 - [ ] **Step 3: Verify anchors, one deck at a time**
 
@@ -1117,8 +1117,8 @@ S="/Users/bogdan/.claude/plugins/cache/nix-config/nix/1.0.2/scripts/gslides.sh"
 | Slide | Anchor | Current context | Proposed text | Category | Source |
 |---|---|---|---|---|---|
 | 9 | typical case - an app with fixed-size thread pool, running various tasks | multi-CPU multithreaded | With virtual threads (21+) a blocking task no longer holds a platform thread | addition | https://openjdk.org/jeps/444 |
-| 10 | first step - size thread pool should increased | keep in mind | Before enlarging the pool, check whether the JVM sees the container's CPU quota | addition | https://openjdk.org/jeps/343 |
-| 2 | goal in performance - driving CPU usage high possible short possible | performance tuning end-goal | Under a cgroup quota, availableProcessors() reports the limit, not the host's cores | addition | https://openjdk.org/jeps/343 |
+| 10 | first step - size thread pool should increased | keep in mind | Before enlarging the pool, check whether the JVM sees the container's CPU quota | addition | https://bugs.openjdk.org/browse/JDK-8196595 |
+| 2 | goal in performance - driving CPU usage high possible short possible | performance tuning end-goal | Under a cgroup quota, availableProcessors() reports the limit, not the host's cores | addition | https://bugs.openjdk.org/browse/JDK-8196595 |
 
 - [ ] **Step 3: Write `docs/deck-changes/03-3.md` and `03-4.md` — reductions**
 
@@ -1180,7 +1180,7 @@ S="/Users/bogdan/.claude/plugins/cache/nix-config/nix/1.0.2/scripts/gslides.sh"
 
 | Slide | Anchor | Current context | Proposed text | Category | Source |
 |---|---|---|---|---|---|
-| 4 | Client-class machines - any 32-bit JVM running on | Java ergonomics | Ergonomics today keys off available CPUs and memory - including container limits | correction | https://openjdk.org/jeps/343 |
+| 4 | Client-class machines - any 32-bit JVM running on | Java ergonomics | Ergonomics today keys off available CPUs and memory - including container limits | correction | https://bugs.openjdk.org/browse/JDK-8196595 |
 | 4 | Ex: default Garbage Collector platform - determined by machine class | ergonomics | Default collector: Serial on a single-CPU cgroup, G1 otherwise | correction | https://openjdk.org/jeps/248 |
 | 2 | Three new GCs (G1, ZGC & Shenandoah) | performance management status | G1 (default since 9), ZGC (generational, default mode since 23) and Shenandoah | correction | https://openjdk.org/jeps/474 |
 
