@@ -1,19 +1,23 @@
 # Java Performance Training — local Kubernetes setup
 
-**We do this together in the first hour of day one**, as the first hands-on exercise. If you get
-through it beforehand, even better — come anyway and help your neighbour.
+**You have about 30 minutes to work through this on your own, then we regroup.**
 
-**Tested on:** Windows 10 and Windows 11.
+Tested on Windows 10 and Windows 11. If you already did some of it beforehand, skip ahead — and if
+you finish early, say so in the chat and I will point you at whoever is stuck.
 
-### Two rules for the hour
+### Three things to know before you start
 
 **Do not get stuck.** If a step has not worked after five minutes, paste the command and its output
-in the Zoom chat and move on. Since much of this runs in parallel, the chat is the fastest way for me
-to see what is happening on your machine — and **none of this blocks the course.** I run every
-Kubernetes demonstration live, so anyone who does not get a cluster running still sees everything.
+in the Zoom chat and move on to the next one. We are all working in parallel, so the chat is the
+only way I can see what is happening on your machine. I will pick things up there as they appear.
 
-**This is optional depth, not admission.** The hands-on labs need only the JDK and the project.
-A local cluster lets you run the pod-level parts yourself rather than watching.
+**Nothing here blocks the course.** I run every Kubernetes demonstration live, so if you end the 30
+minutes without a cluster you still see everything. The hands-on labs need only the JDK and the
+project from Step 1.
+
+**Step 2 may ask you to restart Windows.** That is normal. You will drop off the call — just rejoin
+when you are back, and carry on where you left off. If a restart will not fit in the time, skip to
+the end and say so in the chat; we can finish it later.
 
 ---
 
@@ -36,9 +40,8 @@ cd java-performance-training
 .\mvnw.cmd -q package -DskipTests
 ```
 
-The first build downloads dependencies and may take a few minutes. **If you can run this before the
-day, please do** — a room full of first-time Maven builds on one Wi-Fi connection is slow. If not,
-start it now and read ahead while it works.
+The first build downloads its dependencies and takes a few minutes. Start it now and read ahead
+while it runs — there is no reason to sit and watch it.
 
 **Check it worked:** the command finishes without an error and a `target` folder appears.
 
@@ -179,7 +182,7 @@ sudo k0s kubectl get nodes # k0s
 ## If something goes wrong
 
 **`wsl --install` fails, or mentions virtualisation.** Virtualisation is disabled in your BIOS/UEFI.
-Worth fixing eventually, but skip the cluster for today and tell me.
+Worth fixing eventually, but skip the cluster for today and say so in the chat.
 
 **`systemctl` reports an error inside Ubuntu.** The `/etc/wsl.conf` edit did not take. Check the
 file contents, then `wsl --shutdown` in PowerShell and reopen Ubuntu.
