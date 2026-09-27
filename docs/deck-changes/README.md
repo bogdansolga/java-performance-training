@@ -87,7 +87,11 @@ scope — visible, never silent.
 | 5.3 Basic GC tuning | `05-3-gc-tuning.md` | not started |
 | 6.1 Largest heap objects | `06-1-heap-objects.md` | not started |
 | 6.2 Memory leaks | `06-2-memory-leaks.md` | not started |
-| 2.x Workflow group | `02-workflow-group.md` | not started |
+| 2 Performance improvements workflow | `02-workflow.md` | verify doc ready 2026-09-27 |
+| 2.1 Test the real application | `02-1-real-application.md` | verify doc ready 2026-09-27 |
+| 2.2 Throughput, batching, response times | `02-2-throughput.md` | verify doc ready 2026-09-27 |
+| 2.3 Variability | `02-3-variability.md` | verify doc ready 2026-09-27 |
+| 2.4 Test early, test often | `02-4-test-early.md` | verify doc ready 2026-09-27 |
 | 3 + 3.1 Toolbox & profiling | `03-toolbox-profiling.md` | not started |
 | 3.2–3.4 CPU/Disk/Network | `03-2-4-cpu-disk-network.md` | not started |
 | 1 + Overview | `01-overview.md` | not started |
