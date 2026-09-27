@@ -5,6 +5,7 @@ import net.safedata.performance.training.model.Product;
 import net.safedata.performance.training.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -80,5 +81,12 @@ public class ProductController {
     public String getPoolSize() {
         final ForkJoinPool forkJoinPool = ForkJoinPool.commonPool();
         return forkJoinPool.getPoolSize() + " / " + Runtime.getRuntime().availableProcessors();
+    }
+
+    // Kubernetes lab (docs/k8s-lab-playbook.md): a single large response object, to reproduce the
+    // G1 humongous-allocation production incident under a container memory limit.
+    @GetMapping(value = "/humongous", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<byte[]> humongousResponse() {
+        return ResponseEntity.ok(productService.getHumongousPayload());
     }
 }

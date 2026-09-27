@@ -1,0 +1,83 @@
+# The app under test. Shipped at the step-1 baseline: NO resources block at all (BestEffort QoS,
+# no memory protection). docs/k8s-lab-playbook.md walks through adding `resources` here at step 2
+# (requests == limits == 1Gi memory) and leaves it unchanged for steps 3 and 4 — only
+# k8s/20-jvm-config.yaml changes after that.
+#
+# NOTE: intentionally memory-only, no cpu request/limit. Testing found that a cpu limit below 2
+# full cores makes Runtime.availableProcessors() return a value whose /2 is 0, and
+# SchedulingConfig#threadPoolTaskScheduler (src/main/java/.../config/SchedulingConfig.java) then
+# fails fast with "'poolSize' must be 1 or higher" — the pod crash-loops before the memory lesson
+# even starts. See docs/k8s-lab-playbook.md and the report for details. QoS class is therefore
+# Burstable, not Guaranteed, once the memory limit is added.
+#
+# Image is built locally (see Dockerfile) and must be imported into the cluster before this
+# manifest is applied — a locally-built image is not visible to the cluster otherwise:
+#   k3d image import java-perf-training:lab -c perf                                   (k3d / trainer)
+#   docker save java-perf-training:lab | sudo k3s ctr images import -                 (k3s in WSL2)
+apiVersion: v1
+kind: Service
+metadata:
+  name: app
+  namespace: perf-lab
+  labels:
+    app: app
+spec:
+  type: ClusterIP
+  selector:
+    app: app
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+  namespace: perf-lab
+  labels:
+    app: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      containers:
+        - name: app
+          image: java-perf-training:lab
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: jvm-opts
+          # No `resources:` block at step 1 — see header comment. Step 2 of the playbook adds:
+          #
+          # resources:
+          #   requests:
+          #     memory: 1Gi
+          #   limits:
+          #     memory: 1Gi
+          startupProbe:
+            httpGet:
+              path: /product/pool-size
+              port: 8080
+            failureThreshold: 30
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /product/pool-size
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /product/pool-size
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 15

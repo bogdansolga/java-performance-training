@@ -1,0 +1,35 @@
+# Drives load against the app's /product/humongous endpoint (several MB per response — see
+# ProductService#getHumongousPayload) so steps 3 and 4 of docs/k8s-lab-playbook.md have something
+# to observe under sustained traffic. Re-create with `kubectl apply -f k8s/40-load-job.yaml
+# --force` before each step that needs load (a finished Job's pod template is immutable).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: load-generator
+  namespace: perf-lab
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: load-generator
+          image: curlimages/curl:8.11.0
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "Sending humongous-payload requests to app:8080 ..."
+              for lane in 1 2 3 4 5 6 7 8; do
+                ( for i in $(seq 1 150); do
+                    curl -s -o /dev/null -w "%{http_code}\n" http://app:8080/product/humongous
+                  done ) &
+              done
+              wait
+              echo "Load generation finished."
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi

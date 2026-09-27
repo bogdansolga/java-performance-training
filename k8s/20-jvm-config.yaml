@@ -1,0 +1,19 @@
+# The one file participants edit during the lab (docs/k8s-lab-playbook.md).
+#
+# JAVA_TOOL_OPTIONS is read automatically by every JVM at startup (no entrypoint change needed).
+# Shipped here at the step-1 baseline: no flags at all. The playbook walks through editing this
+# value and re-applying it at each of the four steps.
+#
+# IMPORTANT, found while testing against the live cluster: at a 1Gi container memory limit, JDK 21
+# ergonomics pick Serial GC, not G1 (`UseG1GC {default}=false`, `UseSerialGC {ergonomic}=true`) —
+# the "server-class machine" heuristic looks at the cgroup memory limit, and 1Gi is under its 2GB
+# threshold. Steps 3 and 4 are about G1 humongous-allocation behaviour, so their JAVA_TOOL_OPTIONS
+# must add `-XX:+UseG1GC` explicitly or the whole premise silently does not apply. This is one
+# value change beyond what docs/k8s-objects-plan.md assumed.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jvm-opts
+  namespace: perf-lab
+data:
+  JAVA_TOOL_OPTIONS: ""
