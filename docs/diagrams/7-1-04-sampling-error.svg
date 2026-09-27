@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+
+  <!-- background -->
+  <rect width="1280" height="720" fill="#ffffff"/>
+
+  <!-- title strip -->
+  <text x="40" y="40" font-size="22" font-weight="700" fill="#1a1a1a">The most common sampling error</text>
+  <text x="40" y="64" font-size="13" fill="#5e6680">Even with safepoints everywhere, unlucky timing alone can mislead a sampler.</text>
+
+  <!-- outer container -->
+  <rect x="40" y="88" width="1200" height="560" rx="16" fill="#cfe2f3" stroke="#1a1a1a" stroke-width="1"/>
+
+  <!-- ===== Thread timeline ===== -->
+  <rect x="90" y="130" width="1100" height="200" rx="14" fill="#ffffff" stroke="#1a1a1a" stroke-width="1"/>
+  <text x="120" y="166" font-size="16" font-weight="700" fill="#1a1a1a">Thread timeline - where the thread really is</text>
+
+  <rect x="120" y="190" width="260" height="44" rx="6" fill="#d5f5e3" stroke="#1a1a1a" stroke-width="1"/>
+  <text x="250" y="217" font-size="13" fill="#0e6655" text-anchor="middle">methodA()</text>
+  <rect x="380" y="190" width="90" height="44" rx="6" fill="#ffffff" stroke="#1a1a1a" stroke-width="1"/>
+  <text x="425" y="217" font-size="13" fill="#5e6680" text-anchor="middle">methodB()</text>
+  <rect x="470" y="190" width="230" height="44" rx="6" fill="#d5f5e3" stroke="#1a1a1a" stroke-width="1"/>
+  <text x="585" y="217" font-size="13" fill="#0e6655" text-anchor="middle">methodA()</text>
+  <rect x="700" y="190" width="90" height="44" rx="6" fill="#ffffff" stroke="#1a1a1a" stroke-width="1"/>
+  <text x="745" y="217" font-size="13" fill="#5e6680" text-anchor="middle">methodB()</text>
+  <rect x="790" y="190" width="240" height="44" rx="6" fill="#d5f5e3" stroke="#1a1a1a" stroke-width="1"/>
+  <text x="910" y="217" font-size="13" fill="#0e6655" text-anchor="middle">methodA()</text>
+  <rect x="1030" y="190" width="90" height="44" rx="6" fill="#ffffff" stroke="#1a1a1a" stroke-width="1"/>
+  <text x="1075" y="217" font-size="13" fill="#5e6680" text-anchor="middle">methodB()</text>
+
+  <text x="120" y="268" font-size="13" fill="#5e6680">Sampler ticks (by unlucky coincidence, every one lands inside methodB):</text>
+  <text x="425" y="300" font-size="20" fill="#1a1a1a" text-anchor="middle">&#9660;</text>
+  <text x="745" y="300" font-size="20" fill="#1a1a1a" text-anchor="middle">&#9660;</text>
+  <text x="1075" y="300" font-size="20" fill="#1a1a1a" text-anchor="middle">&#9660;</text>
+
+  <!-- ===== What each report says ===== -->
+  <rect x="90" y="360" width="530" height="240" rx="14" fill="#ffffff" stroke="#1a1a1a" stroke-width="1"/>
+  <rect x="90" y="360" width="530" height="54" rx="14" fill="#fdebd0"/>
+  <rect x="90" y="400" width="530" height="14" fill="#fdebd0"/>
+  <text x="355" y="393" font-size="18" font-weight="700" fill="#7e5109" text-anchor="middle">What the sampler reports</text>
+  <text x="130" y="452" font-size="15" font-weight="700" fill="#1a1a1a">methodB() - 100%</text>
+  <text x="130" y="476" font-size="13" fill="#5e6680">Every one of the three ticks landed inside methodB.</text>
+  <text x="130" y="516" font-size="15" font-weight="700" fill="#1a1a1a">methodA() - 0%</text>
+  <text x="130" y="540" font-size="13" fill="#5e6680">Not a single tick happened to fall inside it.</text>
+  <text x="130" y="576" font-size="13" fill="#7e5109" font-style="italic">A small, unlucky sample - not a bias in the mechanism.</text>
+
+  <rect x="660" y="360" width="530" height="240" rx="14" fill="#ffffff" stroke="#1a1a1a" stroke-width="1"/>
+  <rect x="660" y="360" width="530" height="54" rx="14" fill="#d5f5e3"/>
+  <rect x="660" y="400" width="530" height="14" fill="#d5f5e3"/>
+  <text x="925" y="393" font-size="18" font-weight="700" fill="#0e6655" text-anchor="middle">Reality</text>
+  <text x="700" y="452" font-size="15" font-weight="700" fill="#1a1a1a">methodA() - most of the wall-clock time</text>
+  <text x="700" y="476" font-size="13" fill="#5e6680">Its segments are visibly wider across the timeline.</text>
+  <text x="700" y="516" font-size="15" font-weight="700" fill="#1a1a1a">methodB() - a small fraction</text>
+  <text x="700" y="540" font-size="13" fill="#5e6680">It just happened to be where every tick landed.</text>
+  <text x="700" y="576" font-size="13" fill="#0e6655" font-style="italic">More samples make this converge on the truth.</text>
+
+  <!-- footer -->
+  <text x="640" y="680" font-size="13" fill="#1a1a1a" text-anchor="middle">Unlike safepoint bias (7-1-02), this error is not structural - a shorter interval and a longer run shrink it, which is why two profilers can disagree.</text>
+
+</svg>
