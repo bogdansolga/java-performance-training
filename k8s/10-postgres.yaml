@@ -1,0 +1,84 @@
+# Postgres for the lab — plain Deployment + emptyDir, no PVC, no Secret (credentials are folded
+# into the ConfigMap below since this is a throwaway local database; see docs/k8s-objects-plan.md
+# section 4). Data does not need to survive a pod restart.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  namespace: perf-lab
+data:
+  POSTGRES_DB: perflab
+  POSTGRES_USER: labuser
+  POSTGRES_PASSWORD: aVeryComplexPassword
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: perf-lab
+  labels:
+    app: postgres
+spec:
+  selector:
+    app: postgres
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: perf-lab
+  labels:
+    app: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:18-alpine
+          ports:
+            - containerPort: 5432
+              name: postgres
+          env:
+            # postgres:18-alpine defaults PGDATA to /var/lib/postgresql/18/docker. Point it inside
+            # the mounted emptyDir subPath so the 18+ entrypoint does not abort on its "unused
+            # mount/volume" check.
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          envFrom:
+            - configMapRef:
+                name: postgres-config
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+              subPath: pgdata
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", 'pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"']
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command: ["sh", "-c", 'pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"']
+            initialDelaySeconds: 20
+            periodSeconds: 15
+      volumes:
+        - name: postgres-data
+          emptyDir: {}

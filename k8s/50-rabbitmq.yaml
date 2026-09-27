@@ -1,0 +1,67 @@
+# Ships but is NOT applied by default — see docs/k8s-objects-plan.md section 3. It exists only as
+# "the system that handles async messages", for anyone whose own architecture is async-shaped, so
+# they recognise it. Nothing in the course teaches, measures, or tunes RabbitMQ itself; it is not
+# part of the four-step memory lab and is not referenced by k8s/30-app.yaml.
+#
+# Apply on request only:
+#   kubectl apply -f k8s/50-rabbitmq.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  namespace: perf-lab
+  labels:
+    app: rabbitmq
+spec:
+  selector:
+    app: rabbitmq
+  ports:
+    - name: amqp
+      port: 5672
+      targetPort: 5672
+    - name: management
+      port: 15672
+      targetPort: 15672
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+  namespace: perf-lab
+  labels:
+    app: rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:4-management-alpine
+          ports:
+            - containerPort: 5672
+              name: amqp
+            - containerPort: 15672
+              name: management
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          readinessProbe:
+            tcpSocket:
+              port: 5672
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 5672
+            initialDelaySeconds: 30
+            periodSeconds: 15

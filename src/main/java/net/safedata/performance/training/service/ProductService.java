@@ -30,6 +30,11 @@ public class ProductService {
 
     private static final long BYTES_IN_MB = 1048576;
 
+    // Mirrors the production incident (docs/k8s-prep-work.md, Case A): a single 5-6 MB response
+    // object. At G1's default 1 MB region size, anything over half a region (512 KB) is allocated
+    // directly into old gen as a "humongous" object instead of going through the young generation.
+    private static final int HUMONGOUS_RESPONSE_SIZE_BYTES = 6 * 1024 * 1024;
+
     private static final Random RANDOM = new Random(20000);
 
     private static final Runtime RUNTIME = Runtime.getRuntime();
@@ -175,6 +180,18 @@ public class ProductService {
 
     public synchronized List<Product> getSynchronizedProducts(final String productType) {
         return getALotOfProducts(productType, "synchronized");
+    }
+
+    /**
+     * Allocates and returns a single multi-megabyte byte array, standing in for the large API
+     * responses (5-6 MB each) from the Kubernetes/Cloud Run humongous-allocation incident. The
+     * array is filled with random bytes so it cannot be optimized away; it becomes garbage as soon
+     * as the HTTP response is written.
+     */
+    public byte[] getHumongousPayload() {
+        final byte[] payload = new byte[HUMONGOUS_RESPONSE_SIZE_BYTES];
+        RANDOM.nextBytes(payload);
+        return payload;
     }
 
     private Product buildProduct(final int index) {
