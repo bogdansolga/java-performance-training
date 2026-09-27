@@ -7,9 +7,10 @@ through it beforehand, even better — come anyway and help your neighbour.
 
 ### Two rules for the hour
 
-**Do not get stuck.** If a step has not worked after five minutes, raise your hand. If we cannot fix
-it quickly, move on — **none of this blocks the course.** I run every Kubernetes demonstration live,
-so anyone who does not get a cluster running still sees everything.
+**Do not get stuck.** If a step has not worked after five minutes, paste the command and its output
+in the Zoom chat and move on. Since much of this runs in parallel, the chat is the fastest way for me
+to see what is happening on your machine — and **none of this blocks the course.** I run every
+Kubernetes demonstration live, so anyone who does not get a cluster running still sees everything.
 
 **This is optional depth, not admission.** The hands-on labs need only the JDK and the project.
 A local cluster lets you run the pod-level parts yourself rather than watching.
@@ -19,8 +20,9 @@ A local cluster lets you run the pod-level parts yourself rather than watching.
 ## What you already have
 
 **JDK and IDE** — already on your machine as course prerequisites. We will use them as they are;
-nothing to install. During the course you will switch between **Java 17 and Java 21** to see the
-same code behave differently, so have both available.
+nothing to install. **Whichever version you have is fine** — 17 or 21. A few points in the course
+differ between them; where that happens I will say so and show both, so you lose nothing by having
+one.
 
 ---
 
@@ -154,7 +156,7 @@ sudo k0s kubectl get nodes
 
 ## Final check
 
-Show me the output of these before we move on.
+Paste the output of these in the Zoom chat when you have it.
 
 In **PowerShell**, from the project folder:
 
@@ -189,8 +191,8 @@ moment on first start. If it persists, `sudo systemctl status k3s` will say why.
 Windows user folder, not inside Ubuntu, and needs `wsl --shutdown` to take effect.
 
 **The build fails behind a VPN or proxy.** Maven cannot reach the internet. Try without the VPN; if
-it still fails, show me the error.
+it still fails, paste the error in the Zoom chat.
 
-**Anything else** — show me the command and everything it printed. Do not spend more than five
-minutes stuck on any single step; raise your hand instead. That is what the hour is for, and an
-unfinished cluster costs you nothing.
+**Anything else** — paste in the Zoom chat the command you ran and everything it printed. Do not
+spend more than five minutes stuck on any single step; post it in the chat and carry on. I will
+pick it up there. An unfinished cluster costs you nothing.
