@@ -128,14 +128,21 @@ sudo k3s kubectl get nodes
 
 **Check it worked:** one node listed, status `Ready`.
 
-Make `kubectl` easier to use:
+Now set up `kubectl` so you can use it without `sudo k3s` in front of every command. **Do not skip
+this — the rest of the course assumes plain `kubectl` works.**
 
 ```
 mkdir -p ~/.kube
 sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
 sudo chown $(id -u):$(id -g) ~/.kube/config
+chmod 600 ~/.kube/config
 kubectl get nodes
 ```
+
+**Check it worked:** the same node listed, this time with no `sudo` and no `k3s`.
+
+*If `kubectl: command not found`,* the k3s installer normally provides it. Use `sudo k3s kubectl`
+in place of `kubectl` everywhere, and say so in the chat.
 
 ### Option B — k0s
 
@@ -155,6 +162,21 @@ sudo k0s kubectl get nodes
 
 **Check it worked:** one node listed, status `Ready`.
 
+k0s does **not** install `kubectl` for you, and the rest of the course assumes plain `kubectl`
+works. Install it and point it at your cluster:
+
+```
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+mkdir -p ~/.kube
+sudo k0s kubeconfig admin | tee ~/.kube/config > /dev/null
+chmod 600 ~/.kube/config
+kubectl get nodes
+```
+
+**Check it worked:** the same node listed, this time with no `sudo` and no `k0s`.
+
 ---
 
 ## Final check
@@ -168,12 +190,13 @@ java -version
 .\mvnw.cmd -q package -DskipTests
 ```
 
-In **Ubuntu**, whichever you installed:
+In **Ubuntu**:
 
 ```
-kubectl get nodes          # k3s
-sudo k0s kubectl get nodes # k0s
+kubectl get nodes
 ```
+
+Plain `kubectl`, no `sudo` — that is the thing to confirm, because everything later depends on it.
 
 **If the build succeeds you are ready**, whatever happened with the cluster.
 
