@@ -96,8 +96,8 @@ is how you read the evidence from the run that died.
   but a JDK, because the underlying JVM behaviour is identical with or without a container. The
   container only changes *who* enforces the ceiling.
 
-If you want to run the Kubernetes parts yourself, Part 3 of the setup playbook covers it. It is
-genuinely optional.
+If you want to run the Kubernetes parts yourself, the setup playbook covers it — WSL2 plus either
+k3s or k0s, no Docker required. It is genuinely optional.
 
 ---
 
