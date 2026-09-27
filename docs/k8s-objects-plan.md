@@ -137,6 +137,30 @@ kubectl logs <name> -n perf-lab --previous | grep -i humongous
 `--previous` reads the log of the killed container, which removes the need for a PVC to survive an
 OOMKill — that is why `emptyDir` is sufficient in §4.
 
+## 6b. Image distribution — decided 2026-09-27
+
+**The trainer builds and pushes; participants pull.** The image is
+**`bogdansolga/java-perf-training`**, untagged — so `:latest`, deliberately, so participants always
+receive the current build without anyone coordinating a tag.
+
+This supersedes the earlier "participants build locally" assumption and removes its worst failure
+mode: a locally-built image is invisible to the cluster until imported (`k3d image import`, or
+`docker save | k3s ctr images import`), and a participant who misses that step gets a confusing
+registry error. None of that applies now.
+
+Consequences for the manifests:
+
+- The workload references `bogdansolga/java-perf-training` with no tag.
+- Kubernetes defaults `imagePullPolicy` to `Always` for an untagged or `:latest` image, which is
+  what "always the latest" requires. State it explicitly rather than relying on the default.
+- **`Always` means the kubelet contacts the registry on every pod start.** A participant who is
+  offline, or on a connection that drops, cannot start a pod even with the image already cached —
+  `IfNotPresent` would use the cache but could serve a stale build. The trainer's intent is
+  freshness, so `Always` stands; the mitigation is a `docker pull` during the setup block so the
+  first lab is not waiting on a download.
+- A `Dockerfile` still belongs in the repo — multi-stage, JDK 21 — because it is what produces the
+  pushed image and participants may want to read or rebuild it.
+
 ## 7. Open questions
 
 - ~~Is the async/broker lesson in scope?~~ **Settled: no.** The broker is scenery only; the manifest ships unapplied.
