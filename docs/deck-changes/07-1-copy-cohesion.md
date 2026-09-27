@@ -27,30 +27,47 @@ Both counts are recorded per row in Notes below the table.
 
 | Slide | Anchor | Current context | Proposed text | Category | Source |
 |---|---|---|---|---|---|
-| 22 |  - the top method at 13% (vs 4% under sampling) | Instrumented-profilers bullet: `getPackageSourcesInternal()` + this run. Recites the exact 13%/4% figures now shown by the complementarity diagram on slide 20 |  - the top method under instrumenting; sampling ranked it far lower | correction | n/a |
+| 22 | - the top method at 13% (vs 4% under sampling) | Instrumented-profilers bullet: `getPackageSourcesInternal()` + this run (run itself has a leading space, preserved untouched since row/table field-parsing trims cell edges anyway — see Notes). Recites the exact 13%/4% figures now shown by the complementarity diagram on slide 20 | - the top method under instrumenting; sampling ranked it far lower | correction | n/a |
 | 23 | Although IM.get() uses 12% of the total time, it is called 4.7 million times | "For this analysis:" bullet — recites the exact 12%/4.7M figures also readable off the slide-20 diagram; the argument that follows ("bigger impact from reducing calls, not speeding up the impl") is what the slide should keep | Although IM.get() takes a meaningful share of the total time, it is called far more often than any other method | correction | n/a |
-| 23 | Sampled vs instrumented profiling  | Slide 23 title run (note trailing space before the separate `(contd)` run below) — identical to slide 22's title, only distinguished by "(contd)", a real in-deck navigation problem in a 34-slide deck | Instrumented profiling: a call-count example | correction | n/a |
+| 23 | Sampled vs instrumented profiling | Slide 23 title run (the run's text actually has a trailing space before the separate `(contd)` run below, but Anchor/Proposed-text fields are edge-trimmed by both scripts' parsing, so that space cannot be represented here — see Notes) — identical to slide 22's title, only distinguished by "(contd)", a real in-deck navigation problem in a 34-slide deck | Instrumented profiling: a call-count example | correction, outside-scope-ok | n/a |
 | 23 | (contd) | Slide 23 title, second run, immediately follows the run replaced above | <DELETE> | removal | n/a |
 
-4 rows: 3 `correction`, 1 `removal`. No row required `outside-scope-ok` — all four anchors
-are unique both within their declared slide scope and deck-wide (see Notes).
+4 rows: 3 `correction`, 1 `removal`, 1 of those `outside-scope-ok` (row 3; justified
+below). Counts recomputed after discovering both scripts' Anchor/Proposed-text field
+parsing (`awk -F'|' ... | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'`) strips leading
+and trailing whitespace from the cell content — a first draft of this document wrapped
+every Anchor/Proposed-text cell in backticks, which are *not* stripped by that same
+pipeline, so the literal backtick characters became part of the string `deck-check.sh`
+searched for and every row came back `MISSING` against the live deck. Fixed by dropping
+the backticks; while fixing it, the same trimming behavior turned out to also strip the
+row 1/row 3 anchors' meaningful edge whitespace, handled as follows:
 
-## Notes — anchor verification
-
-- Row 1 anchor ` - the top method at 13% (vs 4% under sampling)` (slide 22, lines 547–580
-  slice): in-scope 1, deck-wide 1.
-- Row 2 anchor `Although IM.get() uses 12% of the total time, it is called 4.7 million
-  times` (slide 23, lines 581–594 slice): in-scope 1, deck-wide 1.
-- Row 3 anchor `Sampled vs instrumented profiling ` (with trailing space; slide 22's title
-  run has no trailing space, so it does not collide): in-scope 1, deck-wide 1.
-- Row 4 anchor `(contd)` (slide 23 slice): in-scope 1, deck-wide 1 — deck-wide because
-  slide 28's own `(contd)` run was already removed by the Manual actions below (done by
-  script, before this table's rows were checked/applied), so it does not inflate the
-  deck-wide count here. Had slide 28 still had it, this row would have needed
-  `outside-scope-ok`; it did not, by construction of the execution order.
-- Proposed-text collision check across all four rows: none of the four Proposed-text
-  strings contains another row's Anchor as a substring, so live sequential application
-  cannot let one row's edit corrupt another row's target text.
+- **Row 1** — run text is ` - the top method at 13% (vs 4% under sampling)` (leading
+  space, since it follows the `getPackageSourcesInternal()` run in the same paragraph).
+  Anchor/Proposed text both written *without* the leading space (`- the top method...`);
+  the original leading space is outside the matched substring on both sides, so it
+  survives the replace untouched and the final sentence still reads correctly. In-scope
+  (slide 22, lines 547–580 slice) 1, deck-wide 1.
+- **Row 2** — anchor `Although IM.get() uses 12% of the total time, it is called 4.7
+  million times` (slide 23, lines 581–594 slice): in-scope 1, deck-wide 1.
+- **Row 3** — run text is `Sampled vs instrumented profiling ` (trailing space, directly
+  followed by the separate `(contd)` run). Because the field-parsing trims that trailing
+  space away regardless of what's written in the cell, the anchor actually used is
+  `Sampled vs instrumented profiling` with no trailing space — which is also a substring
+  of slide 22's title (`Sampled vs instrumented profiling`, no trailing space in that
+  run). In-scope (slide 23 slice) 1, deck-wide 2 → scope mismatch, hence
+  `outside-scope-ok`: the other occurrence is slide 22's own title, correct and must
+  stay untouched. Side effect: the replacement also can't carry a trailing space, so
+  after this row and the `(contd)` deletion below both apply, slide 23's title ends in
+  one harmless trailing space (invisible when rendered) where `(contd)` used to be.
+- **Row 4** — anchor `(contd)` (slide 23 slice): in-scope 1, deck-wide 1 at
+  check/apply time — deck-wide because slide 28's own `(contd)` run was already removed
+  by the Manual actions below (done by script *before* this table's rows were
+  checked/applied), so it doesn't inflate the count here; had slide 28 still had it,
+  this row would have needed `outside-scope-ok` too.
+- Proposed-text collision check across all four rows: none of the four (trimmed)
+  Proposed-text strings contains another row's (trimmed) Anchor as a substring, so live
+  sequential application cannot let one row's edit corrupt another row's target text.
 
 ## Manual actions (done by script — not left for the trainer)
 
