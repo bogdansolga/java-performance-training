@@ -27,10 +27,10 @@ Both counts are recorded per row in Notes below the table.
 
 | Slide | Anchor | Current context | Proposed text | Category | Source |
 |---|---|---|---|---|---|
-| 22 | ` - the top method at 13% (vs 4% under sampling)` | Instrumented-profilers bullet: `getPackageSourcesInternal()` + this run. Recites the exact 13%/4% figures now shown by the complementarity diagram on slide 20 | ` - the top method under instrumenting; sampling ranked it far lower` | correction | n/a |
-| 23 | `Although IM.get() uses 12% of the total time, it is called 4.7 million times` | "For this analysis:" bullet — recites the exact 12%/4.7M figures also readable off the slide-20 diagram; the argument that follows ("bigger impact from reducing calls, not speeding up the impl") is what the slide should keep | `Although IM.get() takes a meaningful share of the total time, it is called far more often than any other method` | correction | n/a |
-| 23 | `Sampled vs instrumented profiling ` | Slide 23 title run (note trailing space before the separate `(contd)` run below) — identical to slide 22's title, only distinguished by "(contd)", a real in-deck navigation problem in a 34-slide deck | `Instrumented profiling: a call-count example` | correction | n/a |
-| 23 | `(contd)` | Slide 23 title, second run, immediately follows the run replaced above | `<DELETE>` | removal | n/a |
+| 22 |  - the top method at 13% (vs 4% under sampling) | Instrumented-profilers bullet: `getPackageSourcesInternal()` + this run. Recites the exact 13%/4% figures now shown by the complementarity diagram on slide 20 |  - the top method under instrumenting; sampling ranked it far lower | correction | n/a |
+| 23 | Although IM.get() uses 12% of the total time, it is called 4.7 million times | "For this analysis:" bullet — recites the exact 12%/4.7M figures also readable off the slide-20 diagram; the argument that follows ("bigger impact from reducing calls, not speeding up the impl") is what the slide should keep | Although IM.get() takes a meaningful share of the total time, it is called far more often than any other method | correction | n/a |
+| 23 | Sampled vs instrumented profiling  | Slide 23 title run (note trailing space before the separate `(contd)` run below) — identical to slide 22's title, only distinguished by "(contd)", a real in-deck navigation problem in a 34-slide deck | Instrumented profiling: a call-count example | correction | n/a |
+| 23 | (contd) | Slide 23 title, second run, immediately follows the run replaced above | <DELETE> | removal | n/a |
 
 4 rows: 3 `correction`, 1 `removal`. No row required `outside-scope-ok` — all four anchors
 are unique both within their declared slide scope and deck-wide (see Notes).
@@ -43,12 +43,11 @@ are unique both within their declared slide scope and deck-wide (see Notes).
   times` (slide 23, lines 581–594 slice): in-scope 1, deck-wide 1.
 - Row 3 anchor `Sampled vs instrumented profiling ` (with trailing space; slide 22's title
   run has no trailing space, so it does not collide): in-scope 1, deck-wide 1.
-- Row 4 anchor `(contd)` (slide 23 slice): in-scope 1. Deck-wide this string occurs twice
-  (also on slide 28's title, handled entirely by Manual actions below, not by this table) —
-  irrelevant here because Row 4 is scoped to slide 23 only and its in-scope/deck-wide
-  counts inside the *table's own pre-flight* both come out to 1 once slide 28's copy is
-  gone; see the ordering note under Manual actions for why slide 28 had to be fixed by
-  script *before* this document's rows were run, not after.
+- Row 4 anchor `(contd)` (slide 23 slice): in-scope 1, deck-wide 1 — deck-wide because
+  slide 28's own `(contd)` run was already removed by the Manual actions below (done by
+  script, before this table's rows were checked/applied), so it does not inflate the
+  deck-wide count here. Had slide 28 still had it, this row would have needed
+  `outside-scope-ok`; it did not, by construction of the execution order.
 - Proposed-text collision check across all four rows: none of the four Proposed-text
   strings contains another row's Anchor as a substring, so live sequential application
   cannot let one row's edit corrupt another row's target text.
@@ -115,7 +114,7 @@ of it needed an index anymore.
    Folded-in text added as a new narrow text box in slide 18's left margin (does not
    overlap the diagram, which occupies the right ~2/3 of the body area):
    ```
-   gslides.sh personal batch 17SQg1F2mSSzV8D4MxupaxumcP8WeDa15SOvqIVYb7P8 @slide18_batch.json
+   gslides.sh personal batch 17SQg1F2mSSzV8D4MxupaxumcP8WeDa15SOvqIVYb7P8 @/tmp/slide18_batch.json
    ```
    where the batch created a `TEXT_BOX` (`objectId: cohesionFold18Note`, 1,500,000 ×
    3,400,000 EMU at x=80,000, y=1,600,000 on slide 18, 12pt) and inserted:
