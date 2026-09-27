@@ -1,11 +1,27 @@
 # Java Performance Training — setup before we start
 
-Please work through this **before day one**, not on the morning. Take your time and message me
-when something does not behave — that is what this window is for, and it is much cheaper to fix a
-week early than live in the session.
+**We do this together in the first hour of day one**, as the first hands-on exercise. If you get
+through it beforehand, even better — come anyway, and help your neighbour.
 
-**Time needed:** about 20 minutes for Part 1, another 20 for Part 2, 15 for Part 3.
 **Tested on:** Windows 10 and Windows 11.
+
+### How the first hour runs
+
+| | |
+|---|---|
+| **Part 1 — the essentials** | ~20 minutes. Everyone. This is the part that matters |
+| **Part 2 — containers** | ~20 minutes. Recommended, not required |
+| **Part 3 — Kubernetes** | ~15 minutes. Optional — I will run these demos live regardless |
+
+Two rules for the hour:
+
+**Do not get stuck.** If a step has not worked after five minutes, raise your hand. If we cannot
+fix it quickly, move to the next part and come back — everything after Part 1 is optional, and no
+step blocks the course.
+
+**Stopping after Part 1 is a complete result.** Part 1 alone is enough for the hands-on labs,
+including the one that reproduces a real production failure. Parts 2 and 3 add depth, not
+admission.
 
 ---
 
@@ -96,8 +112,9 @@ cd java-performance-training
 .\mvnw.cmd -q package -DskipTests
 ```
 
-The first build downloads dependencies and may take a few minutes. **Please do this before the
-course** — doing it live for everyone at once is slow and depends on the room's Wi-Fi.
+The first build downloads dependencies and may take a few minutes. **If you can run this before
+the day, please do** — a room full of first-time Maven builds on one Wi-Fi connection is slow. If
+not, start it now and read ahead while it works.
 
 **Check it worked:** the command finishes without an error, and a `target` folder appears.
 
@@ -220,7 +237,7 @@ One node listed as `Ready` means it works.
 
 ## Final check
 
-Run these and keep the output — send it to me if anything looks wrong.
+Run these and show me the output before we move on.
 
 ```
 java -version
@@ -255,5 +272,6 @@ if it still fails, send me the error.
 **WSL2 is using a lot of memory.** The `.wslconfig` from 2.2 is missing or was not applied. Check
 the file location and spelling, then run `wsl --shutdown` again.
 
-**Anything else** — send me the command you ran and everything it printed. Do not spend more than
-fifteen minutes stuck on any single step; that is what I am here for.
+**Anything else** — show me the command you ran and everything it printed. Do not spend more than
+five minutes stuck on any single step during the session; raise your hand instead. That is what the
+hour is for, and an unfinished Part 2 costs you nothing.
