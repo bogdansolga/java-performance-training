@@ -19,7 +19,10 @@ public class SchedulingConfig {
     public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
         final ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
 
-        threadPoolTaskScheduler.setPoolSize(PROCESSORS_COUNT / 2);
+        // Math.max floors this at 1: on a 1-CPU container availableProcessors() returns 1,
+        // 1 / 2 == 0, and ThreadPoolTaskScheduler rejects a pool size below 1 — the app then
+        // fails to start, with the container still reporting Running.
+        threadPoolTaskScheduler.setPoolSize(Math.max(1, PROCESSORS_COUNT / 2));
         threadPoolTaskScheduler.setThreadGroupName("scheduled-thread-pool-");
         threadPoolTaskScheduler.setThreadNamePrefix("scheduled-thread-");
         threadPoolTaskScheduler.setWaitForTasksToCompleteOnShutdown(true);

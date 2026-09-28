@@ -1,19 +1,17 @@
 # The app under test. Shipped at the step-1 baseline: NO resources block at all (BestEffort QoS,
 # no memory protection). docs/k8s-lab-playbook.md walks through adding `resources` here at step 2
-# (requests == limits == 1Gi memory) and leaves it unchanged for steps 3 and 4 — only
-# k8s/20-jvm-config.yaml changes after that.
+# and leaves it unchanged for steps 3 and 4 — only k8s/20-jvm-config.yaml changes after that.
 #
-# NOTE: intentionally memory-only, no cpu request/limit. Testing found that a cpu limit below 2
-# full cores makes Runtime.availableProcessors() return a value whose /2 is 0, and
-# SchedulingConfig#threadPoolTaskScheduler (src/main/java/.../config/SchedulingConfig.java) then
-# fails fast with "'poolSize' must be 1 or higher" — the pod crash-loops before the memory lesson
-# even starts. See docs/k8s-lab-playbook.md and the report for details. QoS class is therefore
-# Burstable, not Guaranteed, once the memory limit is added.
+# A cpu limit IS safe now. Earlier testing found that a 1-CPU limit crashed startup, because
+# availableProcessors() returned 1 and SchedulingConfig's `/2` gave a pool size of 0. Both that
+# and the matching pattern in PersistenceConfig are floored at 1, so requests == limits on both
+# cpu and memory — which is what earns Guaranteed QoS.
 #
-# Image is built locally (see Dockerfile) and must be imported into the cluster before this
-# manifest is applied — a locally-built image is not visible to the cluster otherwise:
-#   k3d image import java-perf-training:lab -c perf                                   (k3d / trainer)
-#   docker save java-perf-training:lab | sudo k3s ctr images import -                 (k3s in WSL2)
+# Probes use the actuator endpoints. They matter more than they look: without them the container
+# reports Running even when the Spring context has failed, so a broken app looks healthy.
+#
+# Image is pulled from Docker Hub — bogdansolga/java-perf-training, untagged, so :latest, so
+# imagePullPolicy defaults to Always and participants always get the current build.
 apiVersion: v1
 kind: Service
 metadata:
@@ -49,8 +47,8 @@ spec:
     spec:
       containers:
         - name: app
-          image: java-perf-training:lab
-          imagePullPolicy: Never
+          image: bogdansolga/java-perf-training
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           envFrom:
@@ -60,24 +58,26 @@ spec:
           #
           # resources:
           #   requests:
+          #     cpu: "1"
           #     memory: 1Gi
           #   limits:
+          #     cpu: "1"
           #     memory: 1Gi
           startupProbe:
             httpGet:
-              path: /product/pool-size
+              path: /actuator/health/readiness
               port: 8080
             failureThreshold: 30
             periodSeconds: 5
           readinessProbe:
             httpGet:
-              path: /product/pool-size
+              path: /actuator/health/readiness
               port: 8080
             initialDelaySeconds: 5
             periodSeconds: 10
           livenessProbe:
             httpGet:
-              path: /product/pool-size
+              path: /actuator/health/liveness
               port: 8080
             initialDelaySeconds: 15
             periodSeconds: 15

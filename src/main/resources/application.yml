@@ -62,3 +62,17 @@ decorator.datasource.p6spy.log-file: spy.log
 #decorator.datasource.p6spy.log-format:
 # Use regex pattern to filter log messages. If specified only matched messages will be logged.
 #decorator.datasource.p6spy.log-filter.pattern=
+
+# Actuator, scoped to what the Kubernetes probes need. Without these the container reports
+# Running even when the Spring context has failed, so Kubernetes cannot tell a working app
+# from a dead one.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
