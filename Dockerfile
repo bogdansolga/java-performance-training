@@ -1,9 +1,11 @@
 # Java Performance Training — lab image
 #
 # Multi-stage build: compile with Maven + JDK 21, ship only the JRE + jar.
-# Participants build this locally (see docs/k8s-lab-playbook.md) — there is no published image.
+# Published by the trainer as bogdansolga/java-perf-training; participants pull it.
+# Built multi-arch because the trainer is on arm64 and participants are on amd64.
 #
-#   docker build -t java-perf-training:lab .
+#   docker buildx build --platform linux/amd64,linux/arm64 \
+#     -t bogdansolga/java-perf-training --push .
 
 # ---- build stage --------------------------------------------------------
 FROM maven:3.9-eclipse-temurin-21 AS build

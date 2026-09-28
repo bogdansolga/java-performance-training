@@ -40,7 +40,10 @@ public class PersistenceConfig {
 
         hikariConfig.setPoolName("connection-pool");
         hikariConfig.setMaximumPoolSize(AVAILABLE_PROCESSORS * 2);
-        hikariConfig.setMinimumIdle(AVAILABLE_PROCESSORS / 2);
+        // Floored at 1 for the same reason as SchedulingConfig, though the symptom differs:
+        // Hikari accepts minimumIdle(0) as legal, so on a 1-CPU container the pool silently
+        // stops retaining idle connections instead of failing — a latency cost, not a crash.
+        hikariConfig.setMinimumIdle(Math.max(1, AVAILABLE_PROCESSORS / 2));
         hikariConfig.setConnectionTimeout(30000);
         hikariConfig.setIdleTimeout(60000);
         hikariConfig.setMaxLifetime(120000);
