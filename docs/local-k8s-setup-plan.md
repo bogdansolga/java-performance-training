@@ -19,7 +19,7 @@ the thing they could not reproduce in production becomes something they can brea
 **G1's region size is derived from the heap size, not from the container.**
 
 The default is `heap / 2048`, clamped to 1–32 MB and rounded to a power of two. A 2 GB heap gives
-**1 MB regions** whether that heap is capped by `-Xmx2g` on bare Windows or by a 2 GB pod limit. An
+**1 MB regions** whether that heap is capped by `-Xmx1g` on bare Windows or by a 1 Gi pod limit. An
 object larger than half a region is humongous either way.
 
 So **case A reproduces with no container, no WSL2, no Kubernetes and no Docker**:
