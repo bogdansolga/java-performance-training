@@ -1,0 +1,61 @@
+# Minimal single-Pod manifest for the training app — enough to prove the image runs.
+#
+#   kubectl apply -f k8s/pod-minimal.yaml
+#   kubectl get pod perf-app -w
+#   kubectl port-forward pod/perf-app 8080:8080
+#   kubectl delete -f k8s/pod-minimal.yaml
+#
+# Runs in the default namespace so it has no dependency on the other manifests.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: perf-app
+  labels:
+    app: perf-app
+spec:
+  containers:
+    - name: app
+      image: bogdansolga/java-perf-training
+      # No tag, so :latest, so Kubernetes pulls on every start and you always get the current build.
+      imagePullPolicy: Always
+      ports:
+        - name: http
+          containerPort: 8080
+
+      env:
+        # -XX:+UseG1GC is deliberate. Below roughly 2 GB the JVM's ergonomics pick Serial GC, and
+        # the humongous-allocation behavior the labs demonstrate is a G1 concept — without this
+        # flag the lesson silently does not reproduce inside a 1 Gi container.
+        #
+        # MaxRAMPercentage rather than -Xmx: the limit below covers the WHOLE process, not just the
+        # heap. -Xmx1g against a 1Gi limit leaves nothing for Metaspace, code cache, thread stacks
+        # or the JVM itself, and the container is killed while the heap still looks healthy.
+        - name: JAVA_TOOL_OPTIONS
+          value: "-XX:+UseG1GC -XX:MaxRAMPercentage=75 -Xlog:gc+heap=debug"
+
+      resources:
+        # requests == limits on both cpu and memory is what earns Guaranteed QoS.
+        # cpu must be at least 1 full core: the app derives thread-pool sizes from
+        # availableProcessors(), and a fractional limit rounds down to 1 core.
+        requests:
+          cpu: "1"
+          memory: 1Gi
+        limits:
+          cpu: "1"
+          memory: 1Gi
+
+      # Without probes the container reports Running even when the Spring context has failed,
+      # so Kubernetes cannot tell a working app from a dead one.
+      readinessProbe:
+        httpGet:
+          path: /actuator/health/readiness
+          port: http
+        initialDelaySeconds: 10
+        periodSeconds: 5
+        failureThreshold: 12
+      livenessProbe:
+        httpGet:
+          path: /actuator/health/liveness
+          port: http
+        initialDelaySeconds: 40
+        periodSeconds: 15
