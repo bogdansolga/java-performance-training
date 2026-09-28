@@ -25,10 +25,19 @@ object larger than half a region is humongous either way.
 So **case A reproduces with no container, no WSL2, no Kubernetes and no Docker**:
 
 ```
-java -Xmx2g -Xlog:gc+heap=debug -jar app.jar
-java -Xmx2g -XX:+PrintFlagsFinal -version | findstr /I "G1HeapRegionSize"
-java -Xmx2g -XX:G1HeapRegionSize=16m ...        the fix
+java -XX:+UseG1GC -Xmx1g -Xlog:gc+heap=debug -jar app.jar
+java -XX:+UseG1GC -Xmx1g -XX:+PrintFlagsFinal -version | findstr /I "G1HeapRegionSize"
+java -XX:+UseG1GC -Xmx1g -XX:G1HeapRegionSize=16m ...        the fix
 ```
+
+**`-XX:+UseG1GC` is not optional, and this was found the hard way.** Humongous allocations are a G1
+concept, and JVM ergonomics select **Serial GC** below the ~2 GB "server-class" threshold. Inside a
+1 Gi container the JVM runs Serial, not G1, and the lesson silently does not reproduce — confirmed
+on a live cluster, where step 3 of the progression failed until the flag was added.
+
+On a laptop with plenty of RAM, ergonomics read the *machine's* memory rather than `-Xmx`, so G1 is
+usually chosen anyway. Set the flag regardless: it costs nothing and removes the gap between "works
+on my machine" and "works in the container".
 
 That is the whole of lab 9's JVM teaching, on a stock Windows JDK, with **zero prerequisites beyond
 the JDK participants already need**.
@@ -63,7 +72,7 @@ correct *on Windows*. It was only wrong for macOS.
 
 ### Tier 0 — plain JDK. **Required. Zero new prerequisites.**
 
-`java -Xmx2g` reproduces the humongous-allocation failure exactly, as shown in §2. Lab 9 runs here.
+`java -XX:+UseG1GC -Xmx1g` reproduces the humongous-allocation failure exactly, as shown in §2. Lab 9 runs here.
 
 ### Tier 1 — a memory-capped container. **Recommended, one install.**
 
@@ -132,7 +141,7 @@ one is a worse outcome than skipping the Kubernetes tier entirely.
 
 - **Tier 0 required.** Lab 9 needs nothing but the JDK. This is the single most valuable thing the
   course hands them: the participant who said case A was *hard to reproduce locally* gets a one-line
-  `java -Xmx2g` that reproduces it on their own Windows laptop.
+  `java -XX:+UseG1GC -Xmx1g` that reproduces it on their own Windows laptop.
 - **Tier 1 + 2 via bare k3s in WSL2**, optional and **not a hard prerequisite**. Lightest of the
   free options, no licensing exposure, and no second WSL2 distro competing for the shared pool.
   Podman Desktop is the alternative if a GUI is wanted for Tier 1 alone.

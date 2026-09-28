@@ -29,27 +29,23 @@ The last one matters most: when a container is killed and restarted, its logs go
 
 ---
 
-## Step 0 — build the image and load it into the cluster
+## Step 0 — get the image
 
-There is no published image — you build it locally.
-
-```bash
-docker build -t java-perf-training:lab .
-```
-
-**Check it worked:** `docker images java-perf-training:lab` lists it, a few hundred MB.
-
-A locally-built image is invisible to the cluster until you import it — this is the single most
-common way this lab silently breaks (pods stuck in `ImagePullBackOff` or `ErrImageNeverPull`).
+The image is published, so there is nothing to build. Pull it once now so the first pod start is
+not waiting on a download:
 
 ```bash
-docker save java-perf-training:lab | sudo k3s ctr images import -
+docker pull bogdansolga/java-perf-training
 ```
 
-*If you set up k0s instead of k3s,* use `sudo k0s ctr images import -` in its place.
+**Check it worked:** the command ends with `Status: Downloaded` or `Status: Image is up to date`.
 
-*If you are the trainer running k3d,* use `k3d image import java-perf-training:lab -c perf`
-instead of the line above.
+The manifests reference `bogdansolga/java-perf-training` with no tag — so `:latest`, and
+`imagePullPolicy: Always` — which means you always get the current build. It also means the
+cluster contacts the registry on every pod start, so this step is a warm-up, not a substitute for
+being online.
+
+*If you want to read or rebuild it,* the `Dockerfile` is in the repo root. You do not need to.
 
 ---
 
