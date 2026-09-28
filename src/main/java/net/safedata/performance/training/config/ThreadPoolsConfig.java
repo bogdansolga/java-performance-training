@@ -8,14 +8,14 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration
 public class ThreadPoolsConfig {
 
-    private static final int CORE_POOL_SIZE = Runtime.getRuntime().availableProcessors();
+    private static final int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
 
     @Bean
     @Primary
     public ThreadPoolTaskExecutor shortExecTimeThreadPool() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(CORE_POOL_SIZE);
-        executor.setMaxPoolSize(CORE_POOL_SIZE * 2);
+        executor.setCorePoolSize(AVAILABLE_PROCESSORS / 2);
+        executor.setMaxPoolSize(AVAILABLE_PROCESSORS * 2);
         executor.setQueueCapacity(100);
         executor.setKeepAliveSeconds(5);
         return executor;
@@ -24,8 +24,8 @@ public class ThreadPoolsConfig {
     @Bean
     public ThreadPoolTaskExecutor longExecTimeThreadPool() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(CORE_POOL_SIZE);
-        executor.setMaxPoolSize(CORE_POOL_SIZE * 2);
+        executor.setCorePoolSize(AVAILABLE_PROCESSORS);
+        executor.setMaxPoolSize(AVAILABLE_PROCESSORS * 2);
         executor.setQueueCapacity(500);
         executor.setKeepAliveSeconds(20);
         return executor;
