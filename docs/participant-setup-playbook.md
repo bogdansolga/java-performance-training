@@ -122,27 +122,25 @@ you would rather try it; it is equally capable here.
 Inside Ubuntu:
 
 ```
-curl -sfL https://get.k3s.io | sh -
+curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE="644" sh -
 sudo k3s kubectl get nodes
 ```
 
 **Check it worked:** one node listed, status `Ready`.
 
-Now set up `kubectl` so you can use it without `sudo k3s` in front of every command. **Do not skip
-this — the rest of the course assumes plain `kubectl` works.**
+k3s installs `kubectl` for you, and `K3S_KUBECONFIG_MODE="644"` above made its config readable, so
+it works straight away:
 
 ```
-mkdir -p ~/.kube
-sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
-sudo chown $(id -u):$(id -g) ~/.kube/config
-chmod 600 ~/.kube/config
 kubectl get nodes
 ```
 
 **Check it worked:** the same node listed, this time with no `sudo` and no `k3s`.
 
-*If `kubectl: command not found`,* the k3s installer normally provides it. Use `sudo k3s kubectl`
-in place of `kubectl` everywhere, and say so in the chat.
+**Why that env var matters.** k3s writes its kubeconfig to `/etc/rancher/k3s/k3s.yaml`, readable by
+root only, and its bundled `kubectl` reads *that file* — not `~/.kube/config`. Without the mode
+setting, plain `kubectl` fails with `permission denied` no matter what you copy where. If you
+already installed k3s without it: `sudo chmod 644 /etc/rancher/k3s/k3s.yaml`.
 
 ### Option B — k0s
 
@@ -209,6 +207,9 @@ Worth fixing eventually, but skip the cluster for today and say so in the chat.
 
 **`systemctl` reports an error inside Ubuntu.** The `/etc/wsl.conf` edit did not take. Check the
 file contents, then `wsl --shutdown` in PowerShell and reopen Ubuntu.
+
+**`kubectl` says `permission denied` on `/etc/rancher/k3s/k3s.yaml`.** You installed k3s without
+`K3S_KUBECONFIG_MODE="644"`. Fix it without reinstalling: `sudo chmod 644 /etc/rancher/k3s/k3s.yaml`
 
 **`k3s kubectl get nodes` says the node is `NotReady`.** Wait a minute and try again — it takes a
 moment on first start. If it persists, `sudo systemctl status k3s` will say why.
