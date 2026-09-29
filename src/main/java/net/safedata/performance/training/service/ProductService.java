@@ -6,6 +6,8 @@ import net.safedata.performance.training.model.Product;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -59,12 +61,13 @@ public class ProductService {
         this.executor = executor;
     }
 
-    //@EventListener(ApplicationReadyEvent.class)
+    @EventListener(ApplicationReadyEvent.class)
     @Transactional
     public void insertSomeProducts() {
+        if (productRepository.count() > 0) return;
+
         final List<ProductEntity> productsToBeInserted =
-                IntStream.rangeClosed(0, 100)
-                         .parallel() // low-hanging fruit --> always parallel
+                IntStream.rangeClosed(0, 20)
                          .mapToObj(ProductService::buildProductEntity)
                          .toList();
 
@@ -72,7 +75,10 @@ public class ProductService {
     }
 
     private static ProductEntity buildProductEntity(int index) {
-        return new ProductEntity(index, "The product " + index, 1000 * RANDOM.nextInt(50000));
+        final ProductEntity product = new ProductEntity();
+        product.setName("The product " + index);
+        product.setPrice(1000 * RANDOM.nextInt(50000));
+        return product;
     }
 
     @Scheduled(
