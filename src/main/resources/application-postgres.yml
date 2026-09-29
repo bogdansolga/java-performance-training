@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    name: performance_training
+    password: performance_training_admin
+    username: performance_training_admin
+    url: jdbc:postgresql://localhost:5432/${spring.datasource.name}

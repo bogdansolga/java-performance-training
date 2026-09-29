@@ -5,7 +5,10 @@ logging:
       zaxxer: warn
     org:
       apache: warn
+      # to see the query parameters - change 'sql' to 'debug' and 'type' to 'trace'
       hibernate: warn
+        #sql: warn
+      #type: warn
       springframework: warn
 
   pattern:
@@ -47,6 +50,10 @@ spring:
 execution:
   time:
     tracing: true
+
+scheduled:
+  beans:
+    enabled: false
 
 # Register P6LogFactory to log JDBC events
 decorator.datasource.p6spy.enable-logging: true
