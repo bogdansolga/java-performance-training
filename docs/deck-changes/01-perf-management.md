@@ -1,6 +1,8 @@
 # Deck 1 — Java performance management overview
 
-**STATUS: VERIFY DOCUMENT — dry-run only, nothing applied.**
+> **STATUS: APPLIED 2026-09-29** — applied by `deck-apply.sh` and independently verified on a fresh dump (each replacement present exactly once, each deleted anchor gone). **DO NOT RE-RUN `deck-apply.sh` ON THIS FILE.**
+
+~~STATUS: VERIFY DOCUMENT — dry-run only, nothing applied.~~
 
 Source read: `gslides.sh personal text 1wpiNHmcXNkXEmwF09xJS9bv4GAex6IQxiBzt_m0X15c` on
 2026-09-27, saved to `/tmp/deck-1-perf-management.txt` (141 lines, 6 slides, indices 0–5).
@@ -35,12 +37,12 @@ Both corrections were made before writing the rows below; no row cites JEP 343 o
 
 | Slide | Anchor | Current context | Proposed text | Category | Source |
 |---|---|---|---|---|---|
-| 4 |  - any 32-bit JVM running on: | "Java ergonomics" slide, "Client-class machines" bullet — this run introduces the two OS/CPU sub-conditions corrected/removed in the next two rows |  - a single-CPU cgroup or machine, regardless of OS | correction | https://docs.oracle.com/en/java/javase/25/gctuning/ergonomics.html, https://openjdk.org/jeps/248 |
+| 4 |  - any 32-bit JVM running on: | "Java ergonomics" slide, "Client-class machines" bullet — this run introduces the two OS/CPU sub-conditions corrected/removed in the next two rows |  - fewer than 2 CPUs or less than 1792 MB of memory (cgroup limits count), regardless of OS | correction | https://docs.oracle.com/en/java/javase/25/gctuning/ergonomics.html, https://openjdk.org/jeps/248, https://github.com/openjdk/jdk/blob/master/src/hotspot/share/runtime/os.cpp (os::is_server_class_machine) |
 | 4 | Microsoft Windows 		- regardless of the number of CPUs on the machine | Same slide, first "Client-class" sub-bullet — Windows-regardless-of-CPU-count no longer determines the collector; superseded by the merged, cgroup-aware condition in the row above | <DELETE> | removal | n/a |
 | 4 | A machine with one CPU  	- regardless of the operating system | Same slide, second "Client-class" sub-bullet — now redundant once the row above states the merged condition | <DELETE> | removal | n/a |
-| 4 | Ex: the default Garbage Collector for a platform - determined by the machine class | Same slide, closing example bullet — ties the (now-corrected) machine-class distinction to a concrete choice but never previously named an actual collector | Ex: the default Garbage Collector - Serial on a single-CPU cgroup, G1 otherwise (ergonomics reads cgroup CPU/memory limits) | correction | https://docs.oracle.com/en/java/javase/25/gctuning/ergonomics.html, https://openjdk.org/jeps/248 |
+| 4 | Ex: the default Garbage Collector for a platform - determined by the machine class | Same slide, closing example bullet — ties the (now-corrected) machine-class distinction to a concrete choice but never previously named an actual collector | Ex: the default Garbage Collector - Serial below 2 CPUs or 1792 MB of memory, G1 otherwise (ergonomics reads cgroup CPU and memory limits) | correction | https://docs.oracle.com/en/java/javase/25/gctuning/ergonomics.html, https://openjdk.org/jeps/248, https://github.com/openjdk/jdk/blob/master/src/hotspot/share/runtime/os.cpp (os::is_server_class_machine) |
 | 2 | Three new GCs  | "Performance management status" slide — first run of a two-run bullet claiming three new GCs became available; G1 has been the default since JDK 9 and is not new | G1 (default since JDK 9), plus  | correction | https://openjdk.org/jeps/248 |
-| 2 | (G1, ZGC & Shenandoah) | Same bullet, second run — parenthetical naming the three collectors; ZGC's and Shenandoah's *generational modes* are the actually-new part, not the collectors themselves | generational ZGC (default since JDK 23) & Shenandoah (generational mode since JDK 24) | correction | https://openjdk.org/jeps/474, https://openjdk.org/jeps/404 |
+| 2 | (G1, ZGC & Shenandoah) | Same bullet, second run — parenthetical naming the three collectors; ZGC's and Shenandoah's *generational modes* are the actually-new part, not the collectors themselves | ZGC (generational mode only since JDK 24) & Shenandoah (generational mode a product feature since JDK 25) | correction | https://openjdk.org/jeps/490, https://openjdk.org/jeps/521 |
 
 No row needed `outside-scope-ok`: every anchor above is unique both within its declared
 scope and deck-wide (in-scope count equals deck-wide count for all six rows — see Anchor

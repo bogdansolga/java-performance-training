@@ -155,18 +155,18 @@ Change "The GlassFish startup profile, showed in Oracle Developer Studio profili
 Not scriptable: three text runs, and `Oracle Developer Studio` occurs twice needing different
 surrounding rewrites.
 
-**12. Place the three approved diagrams** (2560x1440, in `docs/diagrams/`)
+**12. ~~DONE 2026-09-29~~ (on the working copy `17SQg1F2…`) — Place the three approved diagrams** (2560x1440, in `docs/diagrams/`)
 
 - `7-1-01-sampling-vs-instrumenting.png` → **slide 25**, replacing the sampling screenshot
 - `7-1-02-safepoint-bias.png` → **slide 32**, adding to a prose-only explanation
 - `7-1-03-complementarity.png` → **slide 30**, adding to a prose-only comparison
 
-**13. Delete the superseded screenshots** on slides **25, 28, 35, 39, 41**
+**13. ~~SUPERSEDED 2026-09-29~~ by the 33-slide working copy, which replaces the original — Delete the superseded screenshots** on slides **25, 28, 35, 39, 41**
 
 Slide 41 has no text row above it — its screenshot is cut because it belongs to the same
 walkthrough, not because its caption was wrong.
 
-**14. Shortening pass — merge or cut 4 slides**
+**14. ~~SUPERSEDED 2026-09-29~~ by the 33-slide working copy — Shortening pass — merge or cut 4 slides**
 
 - **27** "Quick summary" (sampling) → merge into 25/26; the deck already has summaries at 12 and 41
 - **34** "Instrumented profilers:" → merge into 33 "Conclusions"; both are short recaps of one example

@@ -1,6 +1,8 @@
 # Deck 2.2 — Throughput, batching & response times
 
-**STATUS: VERIFY DOCUMENT — dry-run only, nothing applied.**
+> **STATUS: APPLIED 2026-09-29** — applied by `deck-apply.sh` and independently verified on a fresh dump (each replacement present exactly once, each deleted anchor gone). **DO NOT RE-RUN `deck-apply.sh` ON THIS FILE.**
+
+~~STATUS: VERIFY DOCUMENT — dry-run only, nothing applied.~~
 
 Source read: `gslides.sh personal text 1VN5hu2HWR25jmBczD4Vmugey5BIBd9ha_KDnKK968wA` on
 2026-09-27, saved to `/tmp/deck-02-2-throughput.txt` (361 lines, 18 slides, indices 0–17).

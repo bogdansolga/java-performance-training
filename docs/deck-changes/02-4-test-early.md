@@ -1,6 +1,8 @@
 # Deck 2.4 — Test early, test often
 
-**STATUS: VERIFY DOCUMENT — dry-run only, nothing applied.**
+> **STATUS: APPLIED 2026-09-29** — applied by `deck-apply.sh` and independently verified on a fresh dump (each replacement present exactly once, each deleted anchor gone). **DO NOT RE-RUN `deck-apply.sh` ON THIS FILE.**
+
+~~STATUS: VERIFY DOCUMENT — dry-run only, nothing applied.~~
 
 Source read: `gslides.sh personal text 1y6l5OwUifzcdmI1WP7DidMg4h7aqs0lu9YTMYrkOiTc` on
 2026-09-27, saved to `/tmp/deck-02-4-test-early.txt` (375 lines, 17 slides, indices 0–16).

@@ -87,16 +87,17 @@ cannot tell applied from pending).
 | Deck | Change doc | Status |
 |---|---|---|
 | 0 Training overview | `00-training-overview.md` | ready — 0 scripted rows, 2 new slides (manual) |
-| 1 Java performance management overview | `01-perf-management.md` | ready — 6 rows |
+| 1 Java performance management overview | `01-perf-management.md` | applied 2026-09-29 |
+| 1 pass 2 (64-bit JVMs line) | `01-perf-management-pass2.md` | applied 2026-09-29 |
 | 2 Performance improvements workflow | `02-workflow.md` | no changes needed |
-| 2.1 Test the real application | `02-1-real-application.md` | ready — 2 rows |
-| 2.2 Throughput, batching, response times | `02-2-throughput.md` | ready — 3 rows |
-| 2.3 Variability | `02-3-variability.md` | ready — 1 row |
-| 2.4 Test early, test often | `02-4-test-early.md` | ready — 2 rows |
-| 3 A performance toolbox | `03-toolbox.md` | ready — 2 rows |
+| 2.1 Test the real application | `02-1-real-application.md` | held — deck changed mid-session (17 → 16 slides); slide 15 anchor now on 14, re-scope before applying |
+| 2.2 Throughput, batching, response times | `02-2-throughput.md` | applied 2026-09-29 |
+| 2.3 Variability | `02-3-variability.md` | applied 2026-09-29 |
+| 2.4 Test early, test often | `02-4-test-early.md` | applied 2026-09-29 |
+| 3 A performance toolbox | `03-toolbox.md` | applied 2026-09-29 |
 | 3.1 Execution profiling | `03-1-profiling.md` | ready — 0 scripted rows, 5 new slides (manual) |
 | 3.2–3.4 CPU / Disk / Network | — | no change document yet |
-| 4.1 Infrastructure, architecture, code | `04-1-improvements.md` | ready — 4 rows |
+| 4.1 Infrastructure, architecture, code | `04-1-improvements.md` | applied 2026-09-29 |
 | 4.2 JIT compiler | `04-2-jit.md` | applied 2026-09-24 |
 | 4.2 pass 3 (32-bit annotation) | `04-2-jit-pass3.md` | applied 2026-09-27 |
 | 5.1 Intro to GC | `05-1-gc-intro.md` | applied 2026-09-23 |
@@ -104,7 +105,7 @@ cannot tell applied from pending).
 | 5.2 Choosing a GC | `05-2-choosing-gc.md` | applied 2026-09-27 |
 | 5.3 Basic GC tuning | `05-3-gc-tuning.md` | applied 2026-09-27 |
 | 6.1 Largest heap objects | `06-1-heap-objects.md` | ready — 0 scripted rows, 2 new slides (manual) |
-| 6.2 Memory leaks | `06-2-memory-leaks.md` | ready — 3 rows |
+| 6.2 Memory leaks | `06-2-memory-leaks.md` | applied 2026-09-29 |
 | 7.1 Monitoring & profiling | `07-1-profiling-tools.md` | applied 2026-09-24 (carried into the working copy) |
 | 7.1 pass 2 (items 6–11) | `07-1-profiling-tools-pass2.md` | applied 2026-09-26 (carried into the working copy) |
 | 7.1 reduction 44 → 33 | `07-1-reduction-proposal.md` | executed on the working copy |

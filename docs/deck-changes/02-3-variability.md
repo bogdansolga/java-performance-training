@@ -1,6 +1,8 @@
 # Deck 2.3 — Variability
 
-**STATUS: VERIFY DOCUMENT — dry-run only, nothing applied.**
+> **STATUS: APPLIED 2026-09-29** — applied by `deck-apply.sh` and independently verified on a fresh dump (each replacement present exactly once, each deleted anchor gone). **DO NOT RE-RUN `deck-apply.sh` ON THIS FILE.**
+
+~~STATUS: VERIFY DOCUMENT — dry-run only, nothing applied.~~
 
 Source read: `gslides.sh personal text 172hds2xzS_FOmA9674KBJRICOVCK2x-50R14-MF0g5Q` on
 2026-09-27, saved to `/tmp/deck-02-3-variability.txt` (170 lines, 10 slides, indices 0–9).

@@ -1,6 +1,8 @@
 # Deck 4.1 — Infrastructure, architecture and code improvements
 
-**STATUS: VERIFY DOCUMENT — dry-run only, nothing applied to the live deck.**
+> **STATUS: APPLIED 2026-09-29** — applied by `deck-apply.sh` and independently verified on a fresh dump (each replacement present exactly once, each deleted anchor gone). **DO NOT RE-RUN `deck-apply.sh` ON THIS FILE.**
+
+~~STATUS: VERIFY DOCUMENT — dry-run only, nothing applied to the live deck.~~
 
 Source read: `gslides.sh personal text 1QCPKhQt46v04nDqR-it6fJKDQR28k2xVANOaL0arcj4` on 2026-09-27,
 saved to `/tmp/deck-04-1.txt` (658 lines, 30 slides, indices 0–29). This deck had never been read

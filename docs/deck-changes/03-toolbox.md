@@ -1,6 +1,8 @@
 # Deck 3 — A performance toolbox
 
-**STATUS: DRAFT — not yet applied.** Produced for trainer review. `deck-apply.sh` invoked
+> **STATUS: APPLIED 2026-09-29** — applied by `deck-apply.sh` and independently verified on a fresh dump (each replacement present exactly once, each deleted anchor gone). **DO NOT RE-RUN `deck-apply.sh` ON THIS FILE.**
+
+~~STATUS: DRAFT — not yet applied.~~ Produced for trainer review. `deck-apply.sh` invoked
 only `--dry-run`; live deck never modified.
 
 Source read: `gslides.sh personal text 188yqDAwSq3oRqHIGOQprYPSezctdnM7VPBZAkxQgCYY` on

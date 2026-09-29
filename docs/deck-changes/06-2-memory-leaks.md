@@ -1,6 +1,8 @@
 # Deck 6.2 — Memory leaks, understanding and troubleshooting them
 
-**STATUS: VERIFY DOCUMENT — dry-run only, nothing applied.**
+> **STATUS: APPLIED 2026-09-29** — applied by `deck-apply.sh` and independently verified on a fresh dump (each replacement present exactly once, each deleted anchor gone). **DO NOT RE-RUN `deck-apply.sh` ON THIS FILE.**
+
+~~STATUS: VERIFY DOCUMENT — dry-run only, nothing applied.~~
 
 Source read: `gslides.sh personal text 1klwuS0Hk6atCBY6XVfQDHMz4icJHQVQ224Vc6v_rkAo` on
 2026-09-27, saved to `/tmp/deck-6-2.txt` (423 lines, 19 slides, indices 0–18). Read in
@@ -15,7 +17,7 @@ Notes for why neither could be used as a literal anchor unmodified).
 | Slide | Anchor | Current context | Proposed text | Category | Source |
 |---|---|---|---|---|---|
 | 17 | Avoid using (/ implementing) the | "Avoiding memory leaks" slide, recommendations list, bullet: "Avoid using (/ implementing) the *finalize()* method" | finalize() is deprecated for removal since JDK 18 — use java.lang.ref.Cleaner instead. Avoid implementing the | correction | https://openjdk.org/jeps/421 |
-| 17 | Use the latest LTS version of Java | Same slide, recommendations list, first bullet: "Use the latest LTS version of Java (if applicable in your context)" | Use the latest LTS Java version — 17, 21 or 25 | correction | https://www.oracle.com/java/technologies/java-se-support-roadmap.html |
+| 17 | Use the latest LTS version of Java | Same slide, recommendations list, first bullet: "Use the latest LTS version of Java (if applicable in your context)" | Use a supported LTS Java version — 17, 21 or 25 | correction | https://www.oracle.com/java/technologies/java-se-support-roadmap.html |
 | 8 | preventing the object from being garbage collected | `ThreadLocal` (continued) slide, closing line: "...then a copy of that object will remain on the worker Thread even after the web app is stopped → preventing the object from being garbage collected" | preventing the object from being garbage collected. This pooled-thread hazard changes shape with virtual threads (final since JDK 21): they are not pooled, so a virtual thread does not keep a ThreadLocal alive this way | addition | https://openjdk.org/jeps/444 |
 
 ## Notes / exceptions
