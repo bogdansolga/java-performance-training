@@ -78,23 +78,42 @@ scope — visible, never silent.
 
 ## Index
 
+Status is what the **live deck** shows, not what a document's own STATUS banner says —
+several banners were never updated after their document was applied. Last reconciled
+2026-09-29 by running `deck-check.sh` on every document and grepping the live decks for
+append-style rows (whose anchor survives inside the replacement, so the checker's `ok`
+cannot tell applied from pending).
+
 | Deck | Change doc | Status |
 |---|---|---|
-| 5.1 Intro to GC | `05-1-gc-intro.md` | applied 2026-09-23 |
+| 0 Training overview | `00-training-overview.md` | ready — 0 scripted rows, 2 new slides (manual) |
+| 1 Java performance management overview | `01-perf-management.md` | ready — 6 rows |
+| 2 Performance improvements workflow | `02-workflow.md` | no changes needed |
+| 2.1 Test the real application | `02-1-real-application.md` | ready — 2 rows |
+| 2.2 Throughput, batching, response times | `02-2-throughput.md` | ready — 3 rows |
+| 2.3 Variability | `02-3-variability.md` | ready — 1 row |
+| 2.4 Test early, test often | `02-4-test-early.md` | ready — 2 rows |
+| 3 A performance toolbox | `03-toolbox.md` | ready — 2 rows |
+| 3.1 Execution profiling | `03-1-profiling.md` | ready — 0 scripted rows, 5 new slides (manual) |
+| 3.2–3.4 CPU / Disk / Network | — | no change document yet |
+| 4.1 Infrastructure, architecture, code | `04-1-improvements.md` | ready — 4 rows |
 | 4.2 JIT compiler | `04-2-jit.md` | applied 2026-09-24 |
-| 7.1 Monitoring & profiling | `07-1-profiling-tools.md` | applied 2026-09-24 |
-| 5.2 Choosing a GC | `05-2-choosing-gc.md` | not started |
-| 5.3 Basic GC tuning | `05-3-gc-tuning.md` | not started |
-| 6.1 Largest heap objects | `06-1-heap-objects.md` | not started |
-| 6.2 Memory leaks | `06-2-memory-leaks.md` | not started |
-| 2 Performance improvements workflow | `02-workflow.md` | verify doc ready 2026-09-27 |
-| 2.1 Test the real application | `02-1-real-application.md` | verify doc ready 2026-09-27 |
-| 2.2 Throughput, batching, response times | `02-2-throughput.md` | verify doc ready 2026-09-27 |
-| 2.3 Variability | `02-3-variability.md` | verify doc ready 2026-09-27 |
-| 2.4 Test early, test often | `02-4-test-early.md` | verify doc ready 2026-09-27 |
-| 3 + 3.1 Toolbox & profiling | `03-toolbox-profiling.md` | not started |
-| 3.2–3.4 CPU/Disk/Network | `03-2-4-cpu-disk-network.md` | not started |
-| 1 + Overview | `01-overview.md` | not started |
-| 5.1 pass 2 (items 1) | `05-1-gc-intro-pass2.md` | applied 2026-09-26 |
-| 7.1 pass 2 (items 6-11) | `07-1-profiling-tools-pass2.md` | applied 2026-09-26 |
-| Lab & prerequisite slides | `99-lab-slides.md` | not started |
+| 4.2 pass 3 (32-bit annotation) | `04-2-jit-pass3.md` | applied 2026-09-27 |
+| 5.1 Intro to GC | `05-1-gc-intro.md` | applied 2026-09-23 |
+| 5.1 pass 2 (item 1) | `05-1-gc-intro-pass2.md` | applied 2026-09-26 |
+| 5.2 Choosing a GC | `05-2-choosing-gc.md` | applied 2026-09-27 |
+| 5.3 Basic GC tuning | `05-3-gc-tuning.md` | applied 2026-09-27 |
+| 6.1 Largest heap objects | `06-1-heap-objects.md` | ready — 0 scripted rows, 2 new slides (manual) |
+| 6.2 Memory leaks | `06-2-memory-leaks.md` | ready — 3 rows |
+| 7.1 Monitoring & profiling | `07-1-profiling-tools.md` | applied 2026-09-24 (carried into the working copy) |
+| 7.1 pass 2 (items 6–11) | `07-1-profiling-tools-pass2.md` | applied 2026-09-26 (carried into the working copy) |
+| 7.1 reduction 44 → 33 | `07-1-reduction-proposal.md` | executed on the working copy |
+| 7.1 working copy cohesion | `07-1-copy-cohesion.md` | applied 2026-09-27 (working copy) |
+
+**Deck 7.1:** the working copy `17SQg1F2mSSzV8D4MxupaxumcP8WeDa15SOvqIVYb7P8` (33 slides)
+replaces the original `1952R9NhvuYNuG9TujMfEPpy_w6cZ_yfMvl5zlZb9yoU` (44 slides) — trainer
+decision 2026-09-29. Target the copy for any further 7.1 work.
+
+"Ready" means every anchor verified against the live deck on 2026-09-29 and the document
+awaits `deck-apply.sh`. Once a document is applied, update its row here **and** its STATUS
+banner in the same commit.

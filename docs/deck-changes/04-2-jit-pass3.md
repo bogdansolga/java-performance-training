@@ -1,6 +1,8 @@
 # Deck 4.2 — JIT compiler, pass 3 (simplify the 32-bit annotation)
 
-**STATUS: DRAFT — not yet applied.**
+> **STATUS: APPLIED 2026-09-27** — confirmed on the live deck 2026-09-29. **DO NOT RE-RUN `deck-apply.sh` ON THIS FILE**; append-style rows would double.
+
+~~STATUS: DRAFT — not yet applied.~~
 
 Source read: `gslides.sh personal text 1aLuZ5zUYFn-IeoHERu4HdraXmSG3-XP_C6vKI2_oG0o` on 2026-09-27,
 31 slides. Note the deck gained the AOT slide at 0-based index 13, so every later slide shifted

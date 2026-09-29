@@ -1,5 +1,7 @@
 # Deck 7.1 (trainer's working copy) — cohesion fixes
 
+> **STATUS: APPLIED 2026-09-27** to the working copy — confirmed live 2026-09-29 (all 4 anchors gone). Do not re-run.
+
 **Target: trainer's working copy only** — presentation
 `17SQg1F2mSSzV8D4MxupaxumcP8WeDa15SOvqIVYb7P8`. The original deck
 `1952R9NhvuYNuG9TujMfEPpy_w6cZ_yfMvl5zlZb9yoU` is never touched by this document or its

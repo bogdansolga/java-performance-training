@@ -1,6 +1,8 @@
 # Deck 5.3 — Basic GC tuning
 
-**STATUS: DRAFT — not yet applied.** Produced for trainer review. `deck-apply.sh` was invoked
+> **STATUS: APPLIED 2026-09-27** — confirmed on the live deck 2026-09-29. **DO NOT RE-RUN `deck-apply.sh` ON THIS FILE**; append-style rows would double.
+
+~~STATUS: DRAFT — not yet applied.~~ Produced for trainer review. `deck-apply.sh` was invoked
 only with `--dry-run`; the live deck was never modified.
 
 Source read: `gslides.sh personal text 128eswOqor8syZCg6LLBZAsAjxXcel-oW-EUuBLutRto` on

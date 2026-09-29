@@ -1,6 +1,8 @@
 # Deck 7.1 — Java monitoring & profiling tools — pass 2
 
-**STATUS: DRAFT — not yet applied.** Steps 1–3 only (read, write, check). Step 4 (trainer
+> **STATUS: APPLIED 2026-09-26** — confirmed on the live deck 2026-09-29. **DO NOT RE-RUN `deck-apply.sh` ON THIS FILE**; append-style rows would double.
+
+~~STATUS: DRAFT — not yet applied.~~ Steps 1–3 only (read, write, check). Step 4 (trainer
 approval gate) and Step 5 (`deck-apply.sh` for real) are intentionally **not done** by this pass
 — out of scope per the pass-2 brief's scope limit. `deck-apply.sh` was invoked only with
 `--dry-run`; the live deck was never modified.
