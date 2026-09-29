@@ -1,6 +1,8 @@
 # Deck 2.1 — Test real application
 
-**STATUS: VERIFY DOCUMENT — dry-run only, nothing applied.**
+> **STATUS: APPLIED 2026-09-29** — applied by `deck-apply.sh` and independently verified on a fresh dump. Row 2 re-scoped 15 → 14 after the trainer removed a slide. **DO NOT RE-RUN `deck-apply.sh` ON THIS FILE.**
+
+~~STATUS: VERIFY DOCUMENT — dry-run only, nothing applied.~~
 
 Source read: `gslides.sh personal text 1hft4X0terH2e7xcHIwiXSXc9FRxnkMtUesYdny80PoI` on
 2026-09-27, saved to `/tmp/deck-02-1-real-application.txt` (401 lines, 17 slides, indices
@@ -16,7 +18,7 @@ literally what the labs do.
 | Slide | Anchor | Current context | Proposed text | Category | Source |
 |---|---|---|---|---|---|
 | 7 | http://tutorials.jenkov.com/java-performance/jmh.html | "JMH - the most used microbenchmark" slide, closing line: "A short intro - " + this URL run | https://github.com/openjdk/jmh — the JDK's own microbenchmark harness (OpenJDK Code Tools), with runnable sample benchmarks | correction | https://github.com/openjdk/jmh |
-| 15 | measuring the response time of a REST request | "3. Meso-benchmarks" slide, second bullet run: "Frequent benchmark" + " - measuring the response time of a REST request" | measuring the response time of a REST request — exactly what this course's labs exercise: a REST endpoint under Gatling load, scored against NFR thresholds | addition | src/main/java/net/safedata/performance/training/gatling/README.md |
+| 14 | measuring the response time of a REST request | "3. Meso-benchmarks" slide, second bullet run: "Frequent benchmark" + " - measuring the response time of a REST request" | measuring the response time of a REST request — exactly what this course's labs exercise: a REST endpoint under Gatling load, scored against NFR thresholds | addition | src/main/java/net/safedata/performance/training/gatling/README.md |
 
 ## Notes
 

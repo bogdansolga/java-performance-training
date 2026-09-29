@@ -90,7 +90,7 @@ cannot tell applied from pending).
 | 1 Java performance management overview | `01-perf-management.md` | applied 2026-09-29 |
 | 1 pass 2 (64-bit JVMs line) | `01-perf-management-pass2.md` | applied 2026-09-29 |
 | 2 Performance improvements workflow | `02-workflow.md` | no changes needed |
-| 2.1 Test the real application | `02-1-real-application.md` | held — deck changed mid-session (17 → 16 slides); slide 15 anchor now on 14, re-scope before applying |
+| 2.1 Test the real application | `02-1-real-application.md` | applied 2026-09-29 |
 | 2.2 Throughput, batching, response times | `02-2-throughput.md` | applied 2026-09-29 |
 | 2.3 Variability | `02-3-variability.md` | applied 2026-09-29 |
 | 2.4 Test early, test often | `02-4-test-early.md` | applied 2026-09-29 |
