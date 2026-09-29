@@ -1,0 +1,19 @@
+# Shared by every lab profile: an isolated in-memory database, and none of the demo
+# background work (scheduled product generation, execution-time tracing) that would
+# otherwise leak memory and add noise to every measurement.
+spring:
+  datasource:
+    url: jdbc:h2:mem:lab;DB_CLOSE_DELAY=-1
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+scheduled:
+  beans:
+    enabled: false
+
+execution:
+  time:
+    tracing: false
+
+decorator.datasource.p6spy.enable-logging: false

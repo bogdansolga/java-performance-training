@@ -13,6 +13,7 @@ public class ProfilingDemoApplication {
 				"net.safedata.performance.training.error.CustomExceptionHandler");
 
 		SpringApplication springApplication = new SpringApplication(ProfilingDemoApplication.class);
+		// Activate one issue for a demo, e.g. setAdditionalProfiles(RunProfiles.UNBOUNDED_RETENTION)
 		springApplication.setAdditionalProfiles();
 		springApplication.run(args);
 	}

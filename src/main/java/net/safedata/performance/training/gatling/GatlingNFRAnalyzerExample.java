@@ -10,11 +10,11 @@ public class GatlingNFRAnalyzerExample {
 
     public static void main(String[] args) throws Exception {
         if (args.length < 1) {
-            System.err.println("Usage: GatlingNFRAnalyzerExample <path-to-pdf>");
+            System.err.println("Usage: GatlingNFRAnalyzerExample <gatling-run-dir>");
             System.exit(1);
         }
 
-        Path pdfPath = Path.of(args[0]);
+        Path runDir = Path.of(args[0]);
 
         // Define NFRs
         NFRConfig nfr = NFRConfig.builder()
@@ -33,7 +33,7 @@ public class GatlingNFRAnalyzerExample {
             .build();
 
         // Analyze and print report
-        EvaluationResult result = GatlingReportAnalyzer.analyze(pdfPath.toString(), nfr);
+        EvaluationResult result = GatlingReportAnalyzer.analyze(runDir.toString(), nfr);
 
         // Exit with appropriate code
         System.exit(result.overallResult() == Result.FAIL ? 1 : 0);

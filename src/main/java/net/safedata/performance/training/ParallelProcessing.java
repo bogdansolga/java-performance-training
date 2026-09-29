@@ -20,7 +20,9 @@ public class ParallelProcessing {
     public static void main(String[] args) {
         long now = System.currentTimeMillis();
 
-        try (ExecutorService executorService = Executors.newFixedThreadPool(CORES / 2)) {
+        // ExecutorService is not AutoCloseable before Java 19, so it is shut down in finally
+        final ExecutorService executorService = Executors.newFixedThreadPool(CORES / 2);
+        try {
             ExecutorCompletionService<Integer> executorCompletionService = new ExecutorCompletionService<>(executorService);
 
             for (int i = 0; i <= 20; i++) {
@@ -44,6 +46,8 @@ public class ParallelProcessing {
             System.out.println("There are " + unfinishedTasks.size() + " unfinished tasks");
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            executorService.shutdownNow();
         }
     }
 

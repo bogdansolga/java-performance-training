@@ -34,6 +34,9 @@ target/*
 # macOS
 .DS_Store
 
+# Lab run output
+results/
+
 # Trainer-only material, not delivered to participants
 scripts/
 docs/*/

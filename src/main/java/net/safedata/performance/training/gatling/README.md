@@ -1,6 +1,6 @@
 # Gatling NFR Analyzer
 
-A Java tool that parses Gatling PDF reports and compares performance metrics against configurable NFR (Non-Functional Requirements) thresholds.
+A Java tool that reads Gatling run directories (js/stats.js of the HTML report) and compares performance metrics against configurable NFR (Non-Functional Requirements) thresholds.
 
 ## Quick Start
 
@@ -12,7 +12,7 @@ NFRConfig nfr = NFRConfig.builder()
         .errorRate(0.1, 0.05)          // < 0.1% errors (warn at 0.05%)
     .build();
 
-EvaluationResult result = GatlingReportAnalyzer.analyze("report.pdf", nfr);
+EvaluationResult result = GatlingReportAnalyzer.analyze("target/gatling/mysim-20260929043848811", nfr);
 ```
 
 ## NFR Configuration
@@ -61,7 +61,7 @@ NFRConfig nfr = NFRConfig.builder()
 ```bash
 mvn exec:java \
   -Dexec.mainClass="net.safedata.performance.training.gatling.GatlingNFRAnalyzerExample" \
-  -Dexec.args="path/to/report.pdf" -q
+  -Dexec.args="target/gatling/<simulation>-<timestamp>" -q
 ```
 
 ## Output Format
@@ -121,7 +121,7 @@ OVERALL RESULT: FAIL
 ## Programmatic Usage
 
 ```java
-EvaluationResult result = GatlingReportAnalyzer.analyze("report.pdf", nfr);
+EvaluationResult result = GatlingReportAnalyzer.analyze("target/gatling/mysim-20260929043848811", nfr);
 
 if (result.overallResult() == Result.FAIL) {
     System.out.println("NFR validation failed!");

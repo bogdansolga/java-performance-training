@@ -22,6 +22,15 @@ server:
       min-spare: 2
 
 spring:
+  profiles:
+    group:
+      unbounded-retention: lab
+      n-plus-one-queries: lab
+      lock-contention: lab
+      gc-mismatch: lab
+      code-cache-exhaustion: lab
+      humongous-allocations: lab
+
   datasource:
     driver-class-name: org.h2.Driver
 

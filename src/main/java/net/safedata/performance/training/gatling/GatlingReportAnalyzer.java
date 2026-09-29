@@ -4,7 +4,7 @@ import net.safedata.performance.training.gatling.analyzer.NFREvaluator;
 import net.safedata.performance.training.gatling.model.EvaluationResult;
 import net.safedata.performance.training.gatling.model.GatlingReport;
 import net.safedata.performance.training.gatling.model.NFRConfig;
-import net.safedata.performance.training.gatling.parser.GatlingPdfParser;
+import net.safedata.performance.training.gatling.parser.GatlingStatsParser;
 import net.safedata.performance.training.gatling.report.ConsoleReportWriter;
 
 import java.io.IOException;
@@ -13,7 +13,7 @@ import java.nio.file.Path;
 
 public class GatlingReportAnalyzer {
 
-    private final GatlingPdfParser parser;
+    private final GatlingStatsParser parser;
     private final NFREvaluator evaluator;
     private final ConsoleReportWriter writer;
 
@@ -22,24 +22,25 @@ public class GatlingReportAnalyzer {
     }
 
     public GatlingReportAnalyzer(PrintStream out) {
-        this.parser = new GatlingPdfParser();
+        this.parser = new GatlingStatsParser();
         this.evaluator = new NFREvaluator();
         this.writer = new ConsoleReportWriter(out);
     }
 
-    public EvaluationResult analyze(Path pdfPath, NFRConfig nfrConfig) throws IOException {
-        GatlingReport report = parser.parse(pdfPath);
+    public EvaluationResult analyze(Path runDir, NFRConfig nfrConfig) throws IOException {
+        GatlingReport report = parser.parse(runDir);
         EvaluationResult result = evaluator.evaluate(report, nfrConfig);
         writer.write(report, result);
         return result;
     }
 
+    /** @param runDir a Gatling run directory (containing js/stats.js) */
     // Static convenience method
-    public static EvaluationResult analyze(Path pdfPath, NFRConfig nfrConfig, PrintStream out) throws IOException {
-        return new GatlingReportAnalyzer(out).analyze(pdfPath, nfrConfig);
+    public static EvaluationResult analyze(Path runDir, NFRConfig nfrConfig, PrintStream out) throws IOException {
+        return new GatlingReportAnalyzer(out).analyze(runDir, nfrConfig);
     }
 
-    public static EvaluationResult analyze(String pdfPath, NFRConfig nfrConfig) throws IOException {
-        return new GatlingReportAnalyzer().analyze(Path.of(pdfPath), nfrConfig);
+    public static EvaluationResult analyze(String runDir, NFRConfig nfrConfig) throws IOException {
+        return new GatlingReportAnalyzer().analyze(Path.of(runDir), nfrConfig);
     }
 }

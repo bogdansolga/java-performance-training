@@ -11,10 +11,11 @@ class GatlingReportAnalyzerTest {
 
     @Test
     void analyzeIntegrationTest() throws Exception {
-        Path pdfPath = Path.of("VopProvisioning-07.10.2025.pdf");
+        // Point -Dgatling.runDir at a Gatling run directory (containing js/stats.js) to run this
+        String runDirProperty = System.getProperty("gatling.runDir");
 
-        // Skip if PDF not available
-        if (!pdfPath.toFile().exists()) {
+        // Skip if no run directory is given
+        if (runDirProperty == null || !Path.of(runDirProperty).resolve("js/stats.js").toFile().exists()) {
             return;
         }
 
@@ -32,7 +33,7 @@ class GatlingReportAnalyzerTest {
                 .latency(95.0, 500, null)
             .build();
 
-        EvaluationResult result = GatlingReportAnalyzer.analyze(pdfPath, nfr, out);
+        EvaluationResult result = GatlingReportAnalyzer.analyze(Path.of(runDirProperty), nfr, out);
 
         assertNotNull(result);
         assertEquals(2, result.endpointEvaluations().size());
