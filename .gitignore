@@ -30,3 +30,12 @@ target/*
 
 # SDD scratch (git-ignored per subagent-driven-development)
 .superpowers/
+
+# macOS
+.DS_Store
+
+# Trainer-only material, not delivered to participants
+scripts/
+docs/*/
+!docs/diagrams/
+docs/diagrams/*.png
