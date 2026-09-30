@@ -51,6 +51,10 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
+            # JMX for VisualVM / JMC: add JMX: "1" to the jvm-opts ConfigMap, then
+            # kubectl port-forward -n perf-lab deploy/app 9010:9010 and connect to localhost:9010
+            - containerPort: 9010
+              name: jmx
           envFrom:
             - configMapRef:
                 name: jvm-opts
