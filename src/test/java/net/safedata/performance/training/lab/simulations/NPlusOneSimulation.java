@@ -35,9 +35,11 @@ public class NPlusOneSimulation extends Simulation {
             .exec(http(VERDICT).get("/lab/nplus1/stats")
                     .check(bodyString().saveAs("stats"),
                             status().is(200),
+                            jsonPath("$.sqlStatementsPerRequest").ofLong().saveAs("actual"),
                             jsonPath("$.sqlStatementsPerRequest").ofLong().lte((long) MAX_SQL_STATEMENTS_PER_REQUEST)))
             .exec(session -> {
                 System.out.println("Lab statistics: " + session.getString("stats"));
+                LabResult.record("SQL statements per request", session.contains("actual") ? session.getLong("actual") : null, MAX_SQL_STATEMENTS_PER_REQUEST);
                 return session;
             });
 
@@ -46,7 +48,18 @@ public class NPlusOneSimulation extends Simulation {
                 .andThen(verdict.injectOpen(atOnceUsers(1))))
                 .protocols(http.baseUrl(BASE_URL).shareConnections())
                 .assertions(
-                        global().failedRequests().count().is(0L),
+                        details("stores").failedRequests().count().is(0L),
                         details(VERDICT).failedRequests().count().is(0L));
     }
+
+    @Override
+    public void after() {
+        LabResult.printAtExit();
+    }
+
+    @Override
+    public void before() {
+        LabPreflight.requireLab(BASE_URL, "/lab/nplus1/stats", "n-plus-one-queries");
+    }
+
 }

@@ -45,8 +45,14 @@ public class ContentionSimulation extends Simulation {
                 .andThen(verdict.injectOpen(atOnceUsers(1))))
                 .protocols(http.baseUrl(BASE_URL).shareConnections())
                 .assertions(
-                        global().failedRequests().count().is(0L),
+                        details(CONVERT).failedRequests().count().is(0L),
                         details(CONVERT).responseTime().percentile(95.0).lt(MAX_P95_MILLIS),
                         global().requestsPerSec().gt(MIN_REQUESTS_PER_SECOND));
     }
+
+    @Override
+    public void before() {
+        LabPreflight.requireLab(BASE_URL, "/lab/contention/stats", "lock-contention");
+    }
+
 }

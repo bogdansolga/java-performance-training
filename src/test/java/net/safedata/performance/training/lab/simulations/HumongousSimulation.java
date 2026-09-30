@@ -35,9 +35,11 @@ public class HumongousSimulation extends Simulation {
             .exec(http(VERDICT).get("/lab/humongous/stats")
                     .check(bodyString().saveAs("stats"),
                             status().is(200),
+                            jsonPath("$.humongousGcEvents").ofLong().saveAs("actual"),
                             jsonPath("$.humongousGcEvents").ofLong().lte((long) MAX_HUMONGOUS_GC_EVENTS)))
             .exec(session -> {
                 System.out.println("Lab statistics: " + session.getString("stats"));
+                LabResult.record("collections caused by large allocations", session.contains("actual") ? session.getLong("actual") : null, MAX_HUMONGOUS_GC_EVENTS);
                 return session;
             });
 
@@ -46,7 +48,18 @@ public class HumongousSimulation extends Simulation {
                 .andThen(verdict.injectOpen(atOnceUsers(1))))
                 .protocols(http.baseUrl(BASE_URL).shareConnections())
                 .assertions(
-                        global().failedRequests().count().is(0L),
+                        details("humongous").failedRequests().count().is(0L),
                         details(VERDICT).failedRequests().count().is(0L));
     }
+
+    @Override
+    public void after() {
+        LabResult.printAtExit();
+    }
+
+    @Override
+    public void before() {
+        LabPreflight.requireLab(BASE_URL, "/lab/humongous/stats", "humongous-allocations");
+    }
+
 }

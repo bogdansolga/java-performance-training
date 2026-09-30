@@ -5,6 +5,7 @@ import io.gatling.javaapi.core.Simulation;
 import java.time.Duration;
 
 import static io.gatling.javaapi.core.CoreDsl.constantConcurrentUsers;
+import static io.gatling.javaapi.core.CoreDsl.details;
 import static io.gatling.javaapi.core.CoreDsl.global;
 import static io.gatling.javaapi.core.CoreDsl.scenario;
 import static io.gatling.javaapi.http.HttpDsl.http;
@@ -31,7 +32,13 @@ public class PinningSimulation extends Simulation {
                 .injectClosed(constantConcurrentUsers(USERS).during(Duration.ofSeconds(DURATION_SECONDS))))
                 .protocols(http.baseUrl(BASE_URL).shareConnections())
                 .assertions(
-                        global().failedRequests().count().is(0L),
+                        details("pinned").failedRequests().count().is(0L),
                         global().requestsPerSec().gt(MIN_REQUESTS_PER_SECOND));
     }
+
+    @Override
+    public void before() {
+        LabPreflight.requireLab(BASE_URL, "/lab/contention/stats", "lock-contention");
+    }
+
 }

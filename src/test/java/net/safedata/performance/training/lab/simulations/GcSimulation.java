@@ -48,7 +48,13 @@ public class GcSimulation extends Simulation {
                 .andThen(verdict.injectOpen(atOnceUsers(1))))
                 .protocols(http.baseUrl(BASE_URL).shareConnections())
                 .assertions(
-                        global().failedRequests().count().is(0L),
+                        details(REPORT).failedRequests().count().is(0L),
                         details(REPORT).responseTime().percentile(99.0).lt(MAX_P99_MILLIS));
     }
+
+    @Override
+    public void before() {
+        LabPreflight.requireLab(BASE_URL, "/lab/gc/stats", "gc-mismatch");
+    }
+
 }

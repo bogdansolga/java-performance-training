@@ -24,10 +24,15 @@ A run takes about 60 seconds (75 for `GcSimulation`, 30 for `PinningSimulation`)
 
 ## 3. Read the result
 
-- At the end of the console output, one line per assertion, `true` or `false`. Any `false` fails the run
-  (`Gatling simulation assertions failed`).
-- A failed lab check shows as a failed `verdict: …` request; the value it measured is in `Lab statistics: {...}` just above.
-- The HTML report path is printed: `target/gatling/<simulation>-<timestamp>/index.html`.
+The last line before `BUILD SUCCESS` / `BUILD FAILURE` gives the verdict (labs 1, 2 and 5):
+
+```
+LAB RESULT: FAILED - retained quotes = 12000 (must be <= 1000)
+```
+
+Labs 3 and 4 judge latency: read the `p95` / `p99` / `requests per second` lines — `false` means failed, the measured value is in `(actual : …)`.
+If the application is not running, or runs without the lab's profile, the run stops at once and says so.
+The full HTML report: `target/gatling/<simulation>-<timestamp>/index.html`.
 
 ## Labs
 
@@ -38,8 +43,6 @@ A run takes about 60 seconds (75 for `GcSimulation`, 30 for `PinningSimulation`)
 | 3 Contention | `lock-contention` | `-Xms256m -Xmx256m -XX:+UseG1GC` | `ContentionSimulation` | p95 < 50 ms and > 500 req/s |
 | 4 GC | `gc-mismatch` | `-Xms1g -Xmx1g -XX:+UseSerialGC` | `GcSimulation` | p99 < 15 ms |
 | 5 Humongous | `humongous-allocations` | `-Xms1g -Xmx1g -XX:+UseG1GC` | `HumongousSimulation` | collections caused by large allocations ≤ 1 |
-
-Every simulation also requires that no load request failed.
 
 **Example — lab 2:**
 

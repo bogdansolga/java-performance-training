@@ -45,9 +45,11 @@ public class RetentionSimulation extends Simulation {
             .exec(http(VERDICT).get("/lab/retention/stats")
                     .check(bodyString().saveAs("stats"),
                             status().is(200),
+                            jsonPath("$.retainedQuotes").ofLong().saveAs("actual"),
                             jsonPath("$.retainedQuotes").ofLong().lte((long) MAX_RETAINED_QUOTES)))
             .exec(session -> {
                 System.out.println("Lab statistics: " + session.getString("stats"));
+                LabResult.record("retained quotes", session.contains("actual") ? session.getLong("actual") : null, MAX_RETAINED_QUOTES);
                 return session;
             });
 
@@ -56,7 +58,18 @@ public class RetentionSimulation extends Simulation {
                 .andThen(verdict.injectOpen(atOnceUsers(1))))
                 .protocols(http.baseUrl(BASE_URL).shareConnections())
                 .assertions(
-                        global().failedRequests().count().is(0L),
+                        details("quote").failedRequests().count().is(0L),
                         details(VERDICT).failedRequests().count().is(0L));
     }
+
+    @Override
+    public void after() {
+        LabResult.printAtExit();
+    }
+
+    @Override
+    public void before() {
+        LabPreflight.requireLab(BASE_URL, "/lab/retention/stats", "unbounded-retention");
+    }
+
 }
