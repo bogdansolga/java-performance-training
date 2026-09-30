@@ -2,7 +2,7 @@
 #
 #   kubectl apply -f kubernetes/pod-minimal.yaml
 #   kubectl get pod perf-app -w
-#   kubectl port-forward pod/perf-app 8080:8080
+#   kubectl port-forward pod/perf-app 8080:8080 9010:9010   # app + JMX (VisualVM / JMC: localhost:9010)
 #   kubectl delete -f kubernetes/pod-minimal.yaml
 #
 # Runs in the default namespace so it has no dependency on the other manifests.
@@ -21,6 +21,8 @@ spec:
       ports:
         - name: http
           containerPort: 8080
+        - name: jmx
+          containerPort: 9010
 
       env:
         # -XX:+UseG1GC is deliberate. Below roughly 2 GB the JVM's ergonomics pick Serial GC, and
@@ -32,6 +34,9 @@ spec:
         # or the JVM itself, and the container is killed while the heap still looks healthy.
         - name: JAVA_TOOL_OPTIONS
           value: "-XX:+UseG1GC -XX:MaxRAMPercentage=75 -Xlog:gc+heap=debug"
+        # Opens JMX on port 9010 (no authentication - lab use only). Remove it to run without JMX.
+        - name: JMX
+          value: "1"
 
       resources:
         # requests == limits on both cpu and memory is what earns Guaranteed QoS.

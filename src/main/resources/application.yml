@@ -45,7 +45,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none # replace with 'create' for the first execution
+      ddl-auto: update # creates the tables on first start and keeps the data after that
     open-in-view: false
     properties:
       hibernate:
