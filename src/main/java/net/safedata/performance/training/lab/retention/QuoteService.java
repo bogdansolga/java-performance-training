@@ -18,7 +18,7 @@ public class QuoteService {
     private static final Logger LOGGER = LoggerFactory.getLogger(QuoteService.class);
 
     //TODO simulate a random wait time in the quote method
-    //TODO convert the SKU into an entity, save a few hundred SKUs in the DB, return them from the DB, instead of mocked
+    //TODO convert the Quote into an entity, save a few hundred Quotes in the DB, return them from the DB, instead of mocked
     // after each, run the tests again
 
     private static final int SNAPSHOT_BYTES = 8 * 1024;
