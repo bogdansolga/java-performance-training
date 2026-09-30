@@ -1,4 +1,4 @@
-# The one file participants edit during the lab (docs/k8s-lab-playbook.md).
+# The one file participants edit during the lab (docs/kubernetes-lab-playbook.md).
 #
 # JAVA_TOOL_OPTIONS is read automatically by every JVM at startup (no entrypoint change needed).
 # Shipped here at the step-1 baseline: no flags at all. The playbook walks through editing this
@@ -9,7 +9,7 @@
 # the "server-class machine" heuristic looks at the cgroup memory limit, and 1Gi is under its 2GB
 # threshold. Steps 3 and 4 are about G1 humongous-allocation behaviour, so their JAVA_TOOL_OPTIONS
 # must add `-XX:+UseG1GC` explicitly or the whole premise silently does not apply. This is one
-# value change beyond what docs/k8s-objects-plan.md assumed.
+# value change beyond what the lab design assumed.
 apiVersion: v1
 kind: ConfigMap
 metadata:

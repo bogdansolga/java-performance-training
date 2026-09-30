@@ -1,5 +1,5 @@
 # Postgres for the lab — plain Deployment + emptyDir, no PVC, no Secret (credentials are folded
-# into the ConfigMap below since this is a throwaway local database; see docs/k8s-objects-plan.md
+# into the ConfigMap below since this is a throwaway local database
 # section 4). Data does not need to survive a pod restart.
 apiVersion: v1
 kind: ConfigMap

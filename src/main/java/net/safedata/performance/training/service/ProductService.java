@@ -35,7 +35,7 @@ public class ProductService {
 
     private static final long BYTES_IN_MB = 1048576;
 
-    // Mirrors the production incident (docs/k8s-prep-work.md, Case A): a single 5-6 MB response
+    // Mirrors the production incident (a real Cloud Run incident): a single 5-6 MB response
     // object. At G1's default 1 MB region size, anything over half a region (512 KB) is allocated
     // directly into old gen as a "humongous" object instead of going through the young generation.
     private static final int HUMONGOUS_RESPONSE_SIZE_BYTES = 6 * 1024 * 1024;

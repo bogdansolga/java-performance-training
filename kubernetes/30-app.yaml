@@ -1,6 +1,6 @@
 # The app under test. Shipped at the step-1 baseline: NO resources block at all (BestEffort QoS,
-# no memory protection). docs/k8s-lab-playbook.md walks through adding `resources` here at step 2
-# and leaves it unchanged for steps 3 and 4 — only k8s/20-jvm-config.yaml changes after that.
+# no memory protection). docs/kubernetes-lab-playbook.md walks through adding `resources` here at step 2
+# and leaves it unchanged for steps 3 and 4 — only kubernetes/20-jvm-config.yaml changes after that.
 #
 # A cpu limit IS safe now. Earlier testing found that a 1-CPU limit crashed startup, because
 # availableProcessors() returned 1 and SchedulingConfig's `/2` gave a pool size of 0. Both that

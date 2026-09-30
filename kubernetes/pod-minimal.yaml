@@ -1,9 +1,9 @@
 # Minimal single-Pod manifest for the training app — enough to prove the image runs.
 #
-#   kubectl apply -f k8s/pod-minimal.yaml
+#   kubectl apply -f kubernetes/pod-minimal.yaml
 #   kubectl get pod perf-app -w
 #   kubectl port-forward pod/perf-app 8080:8080
-#   kubectl delete -f k8s/pod-minimal.yaml
+#   kubectl delete -f kubernetes/pod-minimal.yaml
 #
 # Runs in the default namespace so it has no dependency on the other manifests.
 apiVersion: v1

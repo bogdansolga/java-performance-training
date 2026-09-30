@@ -39,10 +39,10 @@ first start to take a minute longer.
 ## Step 1 - apply the baseline
 
 ```bash
-kubectl apply -f k8s/00-namespace.yaml
-kubectl apply -f k8s/10-postgres.yaml
-kubectl apply -f k8s/20-jvm-config.yaml
-kubectl apply -f k8s/30-app.yaml
+kubectl apply -f kubernetes/00-namespace.yaml
+kubectl apply -f kubernetes/10-postgres.yaml
+kubectl apply -f kubernetes/20-jvm-config.yaml
+kubectl apply -f kubernetes/30-app.yaml
 ```
 
 **Check it worked:**
@@ -74,13 +74,13 @@ or VPN, then `kubectl delete pod -n perf-lab -l app=app` to retry.
 
 Two files change together here.
 
-Open `k8s/20-jvm-config.yaml` and change the flags line to:
+Open `kubernetes/20-jvm-config.yaml` and change the flags line to:
 
 ```yaml
   JAVA_TOOL_OPTIONS: "-Xmx1g"
 ```
 
-Open `k8s/30-app.yaml` and add a `resources:` block to the `app` container (right after
+Open `kubernetes/30-app.yaml` and add a `resources:` block to the `app` container (right after
 `envFrom:`, before `startupProbe:`):
 
 ```yaml
@@ -94,9 +94,9 @@ Open `k8s/30-app.yaml` and add a `resources:` block to the `app` container (righ
 Apply both, then generate load:
 
 ```bash
-kubectl apply -f k8s/20-jvm-config.yaml
-kubectl apply -f k8s/30-app.yaml
-kubectl apply -f k8s/40-load-job.yaml
+kubectl apply -f kubernetes/20-jvm-config.yaml
+kubectl apply -f kubernetes/30-app.yaml
+kubectl apply -f kubernetes/40-load-job.yaml
 ```
 
 Watch it:
@@ -135,7 +135,7 @@ kubectl delete job load-generator -n perf-lab
 
 ## Step 3 - replace the fixed heap with `-XX:MaxRAMPercentage=75`
 
-Open `k8s/20-jvm-config.yaml` again and change the flags line to:
+Open `kubernetes/20-jvm-config.yaml` again and change the flags line to:
 
 ```yaml
   JAVA_TOOL_OPTIONS: "-XX:+UseG1GC -XX:MaxRAMPercentage=75 -Xlog:gc+heap=debug:stdout:uptime,tags"
@@ -146,14 +146,14 @@ found that at a 1Gi container limit, JDK 21's ergonomics quietly pick **Serial G
 `-XX:+PrintFlagsFinal` showed `UseSerialGC = true {ergonomic}`. The JVM's "server-class machine"
 check looks at the cgroup memory limit, and 1Gi falls under its 2GB threshold. Without this flag,
 step 3 and step 4 do not exercise G1 at all, and the whole humongous-object story silently does
-not apply. `k8s/20-jvm-config.yaml` carries a comment explaining this.
+not apply. `kubernetes/20-jvm-config.yaml` carries a comment explaining this.
 
-`-Xmx1g` is gone - `limits.memory: 1Gi` in `k8s/30-app.yaml` from step 2 stays as-is.
+`-Xmx1g` is gone - `limits.memory: 1Gi` in `kubernetes/30-app.yaml` from step 2 stays as-is.
 
 ```bash
-kubectl apply -f k8s/20-jvm-config.yaml
+kubectl apply -f kubernetes/20-jvm-config.yaml
 kubectl rollout restart deployment/app -n perf-lab
-kubectl apply -f k8s/40-load-job.yaml
+kubectl apply -f kubernetes/40-load-job.yaml
 ```
 
 Watch the app's own logs (not `--previous` this time - it should survive):
@@ -192,7 +192,7 @@ kubectl delete job load-generator -n perf-lab
 ## Step 4 - your turn: make it stable
 
 Keep the 1Gi limit and `-XX:MaxRAMPercentage=75`. Change **one** more JVM flag in
-`k8s/20-jvm-config.yaml` so that the 6 MB responses stop being humongous, then re-apply as in
+`kubernetes/20-jvm-config.yaml` so that the 6 MB responses stop being humongous, then re-apply as in
 step 3 and run the load again.
 
 **How you know you are done:** `kubectl logs -n perf-lab -l app=app | grep -i humongous` shows

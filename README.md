@@ -6,4 +6,4 @@ The application and hands-on labs for the 'Java performance' training.
 - [Lab issues](docs/lab-issues.md) - the five problems the labs reproduce
 - [Local Kubernetes setup](docs/participant-setup-playbook.md) - optional
 - [Kubernetes, just enough](docs/kubernetes-orientation.md) - five minutes of vocabulary
-- [Kubernetes memory lab](docs/k8s-lab-playbook.md) - the container version of lab 5
+- [Kubernetes memory lab](docs/kubernetes-lab-playbook.md) - the container version of lab 5

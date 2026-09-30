@@ -1,6 +1,6 @@
 # Drives load against the app's /product/humongous endpoint (several MB per response — see
-# ProductService#getHumongousPayload) so steps 3 and 4 of docs/k8s-lab-playbook.md have something
-# to observe under sustained traffic. Re-create with `kubectl apply -f k8s/40-load-job.yaml
+# ProductService#getHumongousPayload) so steps 3 and 4 of docs/kubernetes-lab-playbook.md have something
+# to observe under sustained traffic. Re-create with `kubectl apply -f kubernetes/40-load-job.yaml
 # --force` before each step that needs load (a finished Job's pod template is immutable).
 apiVersion: batch/v1
 kind: Job

@@ -83,7 +83,7 @@ public class ProductController {
         return forkJoinPool.getPoolSize() + " / " + Runtime.getRuntime().availableProcessors();
     }
 
-    // Kubernetes lab (docs/k8s-lab-playbook.md): a single large response object, to reproduce the
+    // Kubernetes lab (docs/kubernetes-lab-playbook.md): a single large response object, to reproduce the
     // G1 humongous-allocation production incident under a container memory limit.
     @GetMapping(value = "/humongous", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<byte[]> humongousResponse() {
