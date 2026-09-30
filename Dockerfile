@@ -43,7 +43,7 @@ RUN arch=$([ "$TARGETARCH" = "arm64" ] && echo arm64 || echo x64) \
 FROM eclipse-temurin:21-jdk
 WORKDIR /app
 
-RUN groupadd --system app && useradd --system --gid app app
+RUN groupadd --system app && useradd --system --create-home --gid app app
 COPY --from=profiler /opt/async-profiler /opt/async-profiler
 COPY --from=build /build/target/*.jar /app/app.jar
 RUN chown -R app:app /app
