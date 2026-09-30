@@ -84,3 +84,13 @@ Run it three times, restarting the application in between:
 3. the same, on JDK 25.
 
 Compare requests/s and p95. The JDK that matters is the one running `java -jar`, not the one running Maven.
+
+## In short
+
+- **Gatling tests** (`src/test/java/.../lab/simulations/`) are *your* tool: they put load on a running
+  application and tell you whether a lab's problem is still there. Each extends `LabSimulation`, which does
+  the common part: check the application runs with the lab's profile, run the load, read `/stats`, judge.
+- **Spring Boot integration tests** (`...IntegrationTest` classes) are the trainer's safety net: they run in the
+  normal build (`./mvnw verify`) and make sure each lab problem still exists. You do not need to run them.
+- The loop: start the application with a profile -> run its Gatling test -> watch in the profiler ->
+  change the code -> rebuild -> run again, until `LAB RESULT: PASSED` (labs 1, 2, 5) or all `true` (labs 3, 4).
