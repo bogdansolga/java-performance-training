@@ -20,6 +20,9 @@
 	<properties>
 		<java.version>17</java.version>
 		<p6spy.version>2.0.0</p6spy.version>
+
+		<gatling-maven-plugin.version>4.21.12</gatling-maven-plugin.version>
+		<gatling-highcharts.version>3.16.0</gatling-highcharts.version>
 		<gatling.resultsFolder>${project.build.directory}/gatling</gatling.resultsFolder>
 	</properties>
 
@@ -65,7 +68,7 @@
 		<dependency>
 			<groupId>io.gatling.highcharts</groupId>
 			<artifactId>gatling-charts-highcharts</artifactId>
-			<version>3.13.5</version>
+			<version>${gatling-highcharts.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -79,7 +82,7 @@
 			<plugin>
 				<groupId>io.gatling</groupId>
 				<artifactId>gatling-maven-plugin</artifactId>
-				<version>4.21.12</version>
+				<version>${gatling-maven-plugin.version}</version>
 				<configuration>
 					<resultsFolder>${gatling.resultsFolder}</resultsFolder>
 				</configuration>
