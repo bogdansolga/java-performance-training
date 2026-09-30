@@ -1,6 +1,6 @@
 package net.safedata.performance.training.lab.harness;
 
-import net.safedata.performance.training.gatling.model.EndpointStats;
+import net.safedata.performance.training.analysis.model.EndpointStats;
 
 import java.util.Comparator;
 import java.util.List;

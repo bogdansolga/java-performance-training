@@ -1,7 +1,7 @@
 package net.safedata.performance.training.lab.harness;
 
-import net.safedata.performance.training.gatling.model.EndpointStats;
-import net.safedata.performance.training.gatling.parser.GatlingStatsParser;
+import net.safedata.performance.training.analysis.model.EndpointStats;
+import net.safedata.performance.training.analysis.parser.GatlingStatsParser;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
