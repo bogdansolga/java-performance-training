@@ -42,3 +42,7 @@ scripts/
 docs/*/
 !docs/diagrams/
 docs/diagrams/*.png
+
+# Trainer notes - pre-call notes and design proposals, never delivered
+docs/k8s-prep-work.md
+docs/k8s-objects-plan.md

@@ -1,4 +1,4 @@
-# What we will see next — Kubernetes, just enough
+# What we will see next - Kubernetes, just enough
 
 For participants who do not use Kubernetes day to day.
 
@@ -24,23 +24,23 @@ Almost everything surprising about Java memory in the cloud follows from that se
 
 ## Five words you will hear
 
-**Container** — your application plus everything it needs to run, packaged together. The JVM inside
+**Container** - your application plus everything it needs to run, packaged together. The JVM inside
 a container does not automatically see the whole machine; it sees what the container was given.
 
-**Pod** — the smallest thing Kubernetes runs. For us, a pod is one container: one JVM.
+**Pod** - the smallest thing Kubernetes runs. For us, a pod is one container: one JVM.
 
-**Node** — a machine, physical or virtual, that pods run on.
+**Node** - a machine, physical or virtual, that pods run on.
 
-**Cluster** — a set of nodes, managed as one. A *control plane* decides what runs where; *workers*
+**Cluster** - a set of nodes, managed as one. A *control plane* decides what runs where; *workers*
 run it.
 
-**Limit** — the memory and CPU ceiling set on a pod. This is the word that matters most.
+**Limit** - the memory and CPU ceiling set on a pod. This is the word that matters most.
 
 ---
 
 ## The mechanism that matters for us
 
-When you give a pod a memory limit, you are setting a ceiling on the **whole process** — not on the
+When you give a pod a memory limit, you are setting a ceiling on the **whole process** - not on the
 Java heap.
 
 That distinction is the source of an enormous amount of confusion, and it is why a JVM can be
@@ -63,12 +63,12 @@ logs, this is a strong candidate.
 
 A single application, run four ways, with one setting changed each time:
 
-1. **No limit** — it runs, and consumes whatever it likes.
-2. **A 1 GB limit, with the heap set to 1 GB** — killed almost immediately. The limit covers more
+1. **No limit** - it runs, and consumes whatever it likes.
+2. **A 1 GB limit, with the heap set to 1 GB** - killed almost immediately. The limit covers more
    than the heap.
-3. **A 1 GB limit, with the heap set as a percentage of it** — survives startup, then develops a
+3. **A 1 GB limit, with the heap set as a percentage of it** - survives startup, then develops a
    sawtooth memory graph and increasingly frequent garbage collections under load.
-4. **The same, plus one more flag** — stable.
+4. **The same, plus one more flag** - stable.
 
 Step 3 to step 4 is a real production incident, reproduced: a service on a 2 GB container, returning
 5–6 MB responses, repeatedly killed, and described by the people who lived it as *hard to reproduce
@@ -92,23 +92,9 @@ is how you read the evidence from the run that died.
 
 - **You do not need to install Kubernetes.** These demonstrations run on the trainer's machine.
 - **You do not need to install Docker** to follow them.
-- **You will still do the hands-on work.** The lab that reproduces the failure above needs nothing
-  but a JDK, because the underlying JVM behaviour is identical with or without a container. The
-  container only changes *who* enforces the ceiling.
+- **You will still do the hands-on work.** Lab 5 in [gatling-labs.md](gatling-labs.md) reproduces the
+  failure above with nothing but the JDK, because the JVM behaves the same with or without a
+  container. The container only changes *who* enforces the ceiling.
 
-If you want to run the Kubernetes parts yourself, the setup playbook covers it — WSL2 plus either
+If you want to run the Kubernetes parts yourself, [participant-setup-playbook.md](participant-setup-playbook.md) covers it - WSL2 plus either
 k3s or k0s, no Docker required. It is genuinely optional.
-
----
-
-## Diagrams to include
-
-Take these from the existing *Kubernetes training* deck rather than redrawing them:
-
-- **Slide 5** — Kubernetes architecture, components and interactions
-- **Slide 8** — high-level architecture overview
-- **Slide 9** — master and node processes
-
-One architecture diagram is enough for this audience. The features list — rollouts, self-healing,
-service discovery, secrets — is not needed here and will pull attention away from the memory story,
-which is the only part of Kubernetes this course actually depends on.

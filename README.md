@@ -1,8 +1,9 @@
 # java-performance-training
-The samples for the 'Java performance' training
 
-To generate an ``OutOfMemoryError`` - add the following params in the 'VM Options':
-``-Xms200m -Xmx200m -XX:+HeapDumpOnOutOfMemoryError``
+The application and hands-on labs for the 'Java performance' training.
 
-To run a lab as a Gatling test, see [docs/gatling-labs-quick-intro.md](docs/gatling-labs-quick-intro.md) (start here), [docs/gatling-labs.md](docs/gatling-labs.md).
-The problems the labs reproduce are described in [docs/lab-issues.md](docs/lab-issues.md).
+- [Gatling labs](docs/gatling-labs.md) - start here: run a lab, watch it in a profiler, fix it
+- [Lab issues](docs/lab-issues.md) - the five problems the labs reproduce
+- [Local Kubernetes setup](docs/participant-setup-playbook.md) - optional
+- [Kubernetes, just enough](docs/kubernetes-orientation.md) - five minutes of vocabulary
+- [Kubernetes memory lab](docs/k8s-lab-playbook.md) - the container version of lab 5

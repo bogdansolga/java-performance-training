@@ -2,7 +2,7 @@
 
 Five problems that show up again and again in production Java services. Each lab reproduces one of them in this application, so you can find it with the tools from the course. This page describes the problem and the symptoms, not the way out.
 
-How to switch a lab on and run it: [gatling-labs.md](gatling-labs.md) (start the application with the lab's profile, then run its Gatling simulation). The profile and JVM options are in the table there.
+How to switch a lab on and run it: [gatling-labs.md](gatling-labs.md).
 
 ## 1. Data that is kept forever (memory leak)
 
@@ -33,7 +33,7 @@ How to switch a lab on and run it: [gatling-labs.md](gatling-labs.md) (start the
 
 ### Extra run: waiting inside a lock with virtual threads
 
-The same profile has a second endpoint, `/lab/contention/pinned`: each request waits 50 ms inside a `synchronized` block. Run `PinningSimulation` three times and compare requests per second and p95: with the application started normally, then with `--spring.threads.virtual.enabled=true` on JDK 21, then with it on JDK 24 or newer. Only the `java` that starts the application matters. The point is to compare the three results and explain the difference.
+The same profile has a second endpoint, `/lab/contention/pinned`: each request waits 50 ms inside a `synchronized` block. Run `PinningSimulation` three times and compare requests per second and p95: with the application started normally, then with `--spring.threads.virtual.enabled=true` on JDK 21, then with it on JDK 25. Only the `java` that starts the application matters. The point is to compare the three results and explain the difference.
 
 ## 4. The wrong garbage collector for the job (GC mismatch)
 
@@ -47,7 +47,7 @@ The same profile has a second endpoint, `/lab/contention/pinned`: each request w
 ## 5. Big responses under a small heap (humongous allocations)
 
 - **What is it?** Each request allocates one very large object, here a 6 MB response body, in a JVM using G1 with a heap of about 1 GB.
-- **Why does it happen?** G1 splits the heap into equal regions, about 1 MB each for a heap this size. An object bigger than half a region is not allocated in the young generation but in its own contiguous regions of the old generation. Endpoints that return whole files, exports or reports build such arrays without anybody noticing.
+- **Why does it happen?** G1 treats very large objects differently from ordinary ones: they skip the young generation. Endpoints that return whole files, exports or reports build such arrays without anybody noticing.
 - **When does it show up?** With a modest heap, typically a container with a memory limit, and enough traffic of large responses. It is hard to reproduce on a developer laptop with a large default heap. In the course: deck 5.1 (introduction to GC) and 5.3 (basic GC tuning).
 - **Where do you see it?** GC log lines with the cause *G1 Humongous Allocation*, repeated GC cycles that free little, memory that saws up and down, and in a container, the process being killed. Tools: `-Xlog:gc*`, JFR, `/lab/humongous/stats` (collections caused by large allocations).
 - **Who notices?** Operations (restarts, out-of-memory kills), and users (slow or failed requests).
