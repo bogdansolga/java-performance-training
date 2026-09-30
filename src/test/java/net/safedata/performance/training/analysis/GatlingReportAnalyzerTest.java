@@ -1,6 +1,5 @@
 package net.safedata.performance.training.analysis;
 
-import net.safedata.performance.training.analysis.GatlingReportAnalyzer;
 import net.safedata.performance.training.analysis.model.*;
 import org.junit.jupiter.api.Test;
 import java.io.ByteArrayOutputStream;

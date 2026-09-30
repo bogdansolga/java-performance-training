@@ -1,9 +1,5 @@
 package net.safedata.performance.training.analysis.model;
 
-import net.safedata.performance.training.analysis.model.EndpointNFR;
-import net.safedata.performance.training.analysis.model.ErrorRateThreshold;
-import net.safedata.performance.training.analysis.model.LatencyThreshold;
-import net.safedata.performance.training.analysis.model.ThroughputThreshold;
 import org.junit.jupiter.api.Test;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;

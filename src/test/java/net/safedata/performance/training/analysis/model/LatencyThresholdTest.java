@@ -1,7 +1,5 @@
 package net.safedata.performance.training.analysis.model;
 
-import net.safedata.performance.training.analysis.model.LatencyThreshold;
-import net.safedata.performance.training.analysis.model.Result;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
