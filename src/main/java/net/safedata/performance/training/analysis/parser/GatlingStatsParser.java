@@ -19,18 +19,26 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /**
- * Reads a Gatling run directory (Gatling 3.13.x layout) into a {@link GatlingReport}.
+ * Reads a Gatling run directory into a {@link GatlingReport}.
  * <p>
- * The numbers come from {@code js/stats.js}: a JavaScript file starting with {@code var stats = {...}}
- * (unquoted keys, numbers as strings, {@code "-"} for "no data"), followed by UI helper functions.
+ * Gatling up to 3.13 keeps the numbers in {@code js/stats.js} ({@code var stats = {...}}: unquoted keys,
+ * numbers as strings, {@code "-"} for "no data"). From 3.14 that file holds only UI code, and the numbers
+ * are read from the statistics table in {@code index.html} instead.
  */
 public class GatlingStatsParser {
 
     static final String ALL_REQUESTS = "All Requests";
     private static final String STATS_FILE = "js/stats.js";
+    private static final String REPORT_FILE = "index.html";
+    // One statistics row of index.html: the request name, then the value cells col-2 .. col-14
+    private static final Pattern STATS_ROW = Pattern.compile(
+            "<tr id=\"[^\"]*\"\\s*>.*?class=\"ellipsed-name\">(.*?)</span>(.*?)</tr>", Pattern.DOTALL);
+    private static final Pattern VALUE_CELL = Pattern.compile("<td class=\"value [a-z]+ col-(\\d+)\">([^<]*)</td>");
     private static final String PREFIX = "var stats = ";
     private static final DateTimeFormatter RUN_DIR_DATE = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
     private static final int[] PERCENTILES = {50, 75, 95, 99};
@@ -45,7 +53,7 @@ public class GatlingStatsParser {
         String content = Files.readString(statsFile);
         int start = content.indexOf(PREFIX);
         if (start < 0) {
-            throw new IOException("Not a Gatling stats.js (no '" + PREFIX.trim() + "'): " + statsFile);
+            return parseReportTable(runDir);
         }
         // trailing tokens (the JS helper functions) are ignored: only the first value is read
         JsonNode root = mapper.readTree(content.substring(start + PREFIX.length()));
@@ -63,6 +71,36 @@ public class GatlingStatsParser {
                     .max((a, b) -> a.getFileName().toString().compareTo(b.getFileName().toString()))
                     .orElseThrow(() -> new IOException("No Gatling run directory (with " + STATS_FILE + ") in " + resultsFolder));
         }
+    }
+
+    /** Gatling 3.14+: the statistics table of index.html (columns: total, ok, ko, % ko, req/s, min, p50, p75, p95, p99, ...). */
+    private GatlingReport parseReportTable(Path runDir) throws IOException {
+        Path reportFile = runDir.resolve(REPORT_FILE);
+        String html = Files.readString(reportFile);
+        List<EndpointStats> endpoints = new ArrayList<>();
+        Matcher row = STATS_ROW.matcher(html);
+        while (row.find()) {
+            Map<Integer, String> cells = new LinkedHashMap<>();
+            Matcher cell = VALUE_CELL.matcher(row.group(2));
+            while (cell.find()) {
+                cells.put(Integer.parseInt(cell.group(1)), cell.group(2));
+            }
+            if (cells.size() < 11) {
+                continue;
+            }
+            long total = (long) number(cells.get(2));
+            long ko = (long) number(cells.get(4));
+            Map<Integer, Integer> percentiles = new LinkedHashMap<>();
+            for (int i = 0; i < PERCENTILES.length; i++) {
+                percentiles.put(PERCENTILES[i], (int) number(cells.get(8 + i)));
+            }
+            endpoints.add(new EndpointStats(row.group(1).trim(), total, (long) number(cells.get(3)), ko,
+                    total > 0 ? ko * 100.0 / total : 0.0, number(cells.get(6)), percentiles));
+        }
+        if (endpoints.isEmpty()) {
+            throw new IOException("No statistics found in " + reportFile + " or " + runDir.resolve(STATS_FILE));
+        }
+        return new GatlingReport(parseRunInfo(runDir), endpoints);
     }
 
     private void collectRequests(JsonNode contents, List<EndpointStats> out) {
@@ -94,7 +132,11 @@ public class GatlingStatsParser {
         if (node.isNumber()) {
             return node.asDouble();
         }
-        String text = node.asString("-").trim();
+        return number(node.asString("-"));
+    }
+
+    private static double number(String raw) {
+        String text = raw == null ? "-" : raw.trim();
         if (text.isEmpty() || "-".equals(text)) {
             return 0;
         }
