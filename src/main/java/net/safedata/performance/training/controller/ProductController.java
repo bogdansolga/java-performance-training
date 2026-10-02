@@ -3,6 +3,8 @@ package net.safedata.performance.training.controller;
 import net.safedata.performance.training.domain.model.ProductEntity;
 import net.safedata.performance.training.model.Product;
 import net.safedata.performance.training.service.ProductService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,6 +22,8 @@ import java.util.concurrent.ForkJoinPool;
 @RestController
 @RequestMapping("/product")
 public class ProductController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProductController.class);
 
     private final ProductService productService;
 
@@ -45,6 +49,7 @@ public class ProductController {
 
     @GetMapping("/deferred-result")
     public DeferredResult<ResponseEntity<?>> deferredResultProcessing() {
+        LOGGER.info("Processing the sales using a Deferred Result");
         DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
         deferredResult.onTimeout(() -> ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT)
                                                      .body("The request has timed-out"));
@@ -57,6 +62,7 @@ public class ProductController {
                                                         .body(ex.getMessage()));
         }
 
+        LOGGER.info("Deferred result has been set");
         return deferredResult;
     }
 

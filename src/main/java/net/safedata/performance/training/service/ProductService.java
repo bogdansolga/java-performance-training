@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
@@ -169,9 +170,11 @@ public class ProductService {
     }
 
     private static double getProductsPriceSum(Collection<Product> products) {
-        //TODO replace with StreamSupport.parallel
+        // the main benefit of the Stream API usage is the ease of reading the code, not the performance
+        // performance is secondary,
         return products.stream()
                        .filter(Objects::nonNull)
+                       .parallel()
                        .mapToDouble(Product::getPrice)
                        .sum();
     }
@@ -181,7 +184,16 @@ public class ProductService {
     }
 
     public double getTotalSales() {
+        sleepALittle();
         return totalSales;
+    }
+
+    private void sleepALittle() {
+        try {
+            Thread.sleep(RANDOM.nextInt(2000));
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public List<Product> getALotOfProducts(final String productType, final String retrievingType) {
@@ -195,6 +207,10 @@ public class ProductService {
     }
 
     public synchronized List<Product> getSynchronizedProducts(final String productType) {
+        if (productType.equalsIgnoreCase("restricted")) {
+            throw new IllegalArgumentException("Restricted products are not yet supported");
+        }
+
         return getALotOfProducts(productType, "synchronized");
     }
 
@@ -244,5 +260,10 @@ public class ProductService {
     private static ProductEntity buildProductEntityFromResultSet(ResultSet rs) throws SQLException {
         return new ProductEntity(rs.getInt("id"), rs.getString("name"),
                 rs.getDouble("price"));
+    }
+
+    @Async("longExecTimeThreadPool")
+    public void useASpecificThreadPool() {
+        // TODO add processing in here
     }
 }
